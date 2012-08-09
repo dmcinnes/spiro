@@ -19,13 +19,21 @@ if (window.performance && window.performance.webkitNow) {
 }
 
 TAU = 2*Math.PI;
-scale = 300;
+maxRadius = 300;
 canvas = document.getElementById('c');
 c = canvas.getContext('2d');
 c.strokeStyle='black';
 c.translate(305,305);
 c.lineWidth = 2;
 step = TAU/360;
+running = true;
+
+function pause() {
+  running = !running;
+  if (running) {
+    loop();
+  }
+}
 
 KEY_CODES = {
   37: 'left',
@@ -38,6 +46,9 @@ KEYS = {};
 
 window.addEventListener('keydown', function (e) {
   KEYS[KEY_CODES[e.keyCode]] = true;
+  if (e.keyCode === 80) {
+    pause();
+  }
 }, false);
 window.addEventListener('keyup', function (e) {
   KEYS[KEY_CODES[e.keyCode]] = false;
@@ -46,18 +57,31 @@ window.addEventListener('keyup', function (e) {
 function renderLine(f,z) {
   i=0;
   c.beginPath();
-  c.moveTo(f(0)*scale,0);
+  c.moveTo(f(0,z),0);
   while (i<TAU) {
-    w = f(i,z) * scale;
+    w = f(i,z);
     c.lineTo(Math.cos(i)*w,Math.sin(i)*w);
     i+=step;
   }
   c.stroke();
 }
 
-function f(x,z) {
-  return Math.sin(x * z);
+function f(t,z) {
+  return Math.sin(t * z) * maxRadius;
 }
+
+function tangentAngle(t,z) {
+  t1 = f(t,z);
+  x1 = Math.cos(t)*t1;
+  y1 = Math.sin(t)*t1;
+  t2 = f(t+step,z);
+  x2 = Math.cos(t+step)*t2;
+  y2 = Math.sin(t+step)*t2;
+  x = x2 - x1;
+  y = y2 - y1;
+  return Math.atan2(y, x); // radians
+}
+
 
 offset = 0;
 zz = 1;
@@ -90,10 +114,24 @@ function loop() {
     zz -= elapsed / 1000;
   }
 
+  rot = offset/100;
+
   c.save();
-  c.rotate(offset/100);
+  c.rotate(rot);
   renderLine(f,zz);
   c.restore();
-  requestAnimFrame(loop, canvas);
+
+  c.save();
+  w = f(rot,zz);
+  c.rotate(rot);
+  c.translate(Math.cos(rot)*w,Math.sin(rot)*w);
+  c.rotate(tangentAngle(rot,zz));
+  c.fillStyle='red';
+  c.fillRect(-10, -10, 20, 20);
+  c.restore();
+
+  if (running) {
+    requestAnimFrame(loop, canvas);
+  }
 }
 loop();
