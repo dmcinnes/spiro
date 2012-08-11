@@ -39,7 +39,8 @@ KEY_CODES = {
   37: 'left',
   38: 'up',
   39: 'right',
-  40: 'down'
+  40: 'down',
+  32: 'space'
 };
 
 KEYS = {};
@@ -84,8 +85,14 @@ function tangentAngle(t,z) {
 
 
 offset = 0;
-zz = 1;
+zz = 0;
+zzTarget = 3;
 lastFrame = timestamp();
+rotAcc = 0;
+rotVel = 0;
+rot = 0;
+maxRot = 0.04;
+
 function loop() {
   thisFrame = timestamp();
   elapsed = thisFrame - lastFrame;
@@ -101,20 +108,29 @@ function loop() {
   c.fillText(Math.round(1000/elapsed), 0, 0);
   c.restore();
 
-  if (KEYS.left) {
-    offset -= elapsed / 10;
-  }
-  if (KEYS.right) {
-    offset += elapsed / 10;
-  }
-  if (KEYS.up) {
-    zz += elapsed / 1000;
-  }
-  if (KEYS.down) {
-    zz -= elapsed / 1000;
+  if (zz < zzTarget) {
+    zz += elapsed / 800;
+  } else {
+    zz = zzTarget;
+    // rotAcc += elapsed / 1000;
+    if (KEYS.left) {
+      rotAcc = -elapsed / 10000;
+    }
+    if (KEYS.right) {
+      rotAcc = elapsed / 10000;
+    }
+    if (KEYS.space) {
+      rotAcc = -rotVel / 10;
+    }
   }
 
-  rot = offset/100;
+  rotVel += rotAcc;
+  if (Math.abs(rotVel) > maxRot) {
+    rotVel = maxRot * Math.abs(rotVel)/rotVel;
+  }
+
+  rot += rotVel;
+  rotAcc = 0;
 
   c.save();
   c.rotate(rot);
