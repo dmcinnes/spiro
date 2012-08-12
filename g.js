@@ -170,12 +170,12 @@ function loop() {
   rot += rotVel;
   rotAcc = 0;
 
+  bada.tick(elapsed);
+  bada.render(c);
+
   renderLine(f,zz,rot);
 
   w = f(rot,zz);
-
-  bada.tick(elapsed);
-  bada.render(c);
 
   c.save();
   c.rotate(rot + Math.PI);
