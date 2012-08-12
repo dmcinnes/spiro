@@ -22,11 +22,39 @@ TAU = 2*Math.PI;
 maxRadius = 300;
 canvas = document.getElementById('c');
 c = canvas.getContext('2d');
-c.strokeStyle='black';
 c.translate(305,305);
 c.lineWidth = 2;
 step = TAU/360;
 running = true;
+
+Bada = function () {
+  this.ani = 0;
+  this.r = 0;
+};
+Bada.prototype = {
+  tick: function (delta) {
+    this.ani += delta / 100;
+    this.ani %= 5;
+
+    this.t += delta / 12000;
+
+    this.r = f(this.t,zz);
+    this.rot = tangentAngle(this.t,zz);
+  },
+  render: function (c) {
+    c.save();
+    translate(this.t, this.r);
+    c.rotate(this.rot + rot);
+    c.beginPath();
+    c.strokeStyle='blue';
+    c.moveTo(-10 + this.ani, 0);
+    c.lineTo(0, -8 - this.ani);
+    c.lineTo(10 - this.ani, 0);
+    c.lineTo(0, 8 + this.ani);
+    c.closePath();
+    c.restore();
+  }
+};
 
 function pause() {
   running = !running;
@@ -55,9 +83,11 @@ window.addEventListener('keyup', function (e) {
   KEYS[KEY_CODES[e.keyCode]] = false;
 }, false);
 
-function renderLine(f,z) {
+function renderLine(f,z,rot) {
+  c.save();
+  c.rotate(rot);
+  c.strokeStyle='black';
   i=0;
-  c.beginPath();
   c.moveTo(f(0,z),0);
   while (i<TAU) {
     w = f(i,z);
@@ -65,6 +95,11 @@ function renderLine(f,z) {
     i+=step;
   }
   c.stroke();
+  c.restore();
+}
+
+function translate(t,r) {
+  c.translate(Math.cos(t + rot)*r, Math.sin(t + rot)*r);
 }
 
 function f(t,z) {
@@ -86,12 +121,15 @@ function tangentAngle(t,z) {
 
 offset = 0;
 zz = 0;
-zzTarget = 3;
+zzTarget = 2;
 lastFrame = timestamp();
 rotAcc = 0;
 rotVel = 0;
 rot = 0;
 maxRot = 0.04;
+
+bada = new Bada();
+bada.t = 1 + Math.PI/2;
 
 function loop() {
   thisFrame = timestamp();
@@ -132,14 +170,15 @@ function loop() {
   rot += rotVel;
   rotAcc = 0;
 
-  c.save();
-  c.rotate(rot);
-  renderLine(f,zz);
-  c.restore();
+  renderLine(f,zz,rot);
+
+  w = f(rot,zz);
+
+  bada.tick(elapsed);
+  bada.render(c);
 
   c.save();
-  w = f(rot,zz);
-  c.rotate(rot);
+  c.rotate(rot + Math.PI);
   c.translate(Math.cos(rot)*w,Math.sin(rot)*w);
   c.rotate(tangentAngle(rot,zz));
   c.fillStyle='red';
