@@ -35,8 +35,20 @@ Bada.prototype = {
   tick: function (delta) {
     this.ani += delta / 100;
     this.ani %= 5;
+    speed = delta / 12000;
+    // --D-b--
+    // --b-D--
+    // -D---b-
+    // -b---D-
+    var dist = this.angle - rot;
+    if (dist < Math.PI) {
+      speed *= (dist < 0) ? 1 : -1;
+    } else {
+      speed *= (dist > 0) ? 1 : -1;
+    }
 
-    this.angle += delta / 12000;
+    this.angle += speed;
+    this.angle = clamp(this.angle);
 
     this.dist = f(this.angle, zz);
     this.rot = tangentAngle(this.angle,zz);
@@ -100,6 +112,14 @@ function renderLine(f,z,rot) {
 
 function translate(theta,dist) {
   c.translate(Math.cos(theta + rot)*dist, Math.sin(theta + rot)*dist);
+}
+
+function clamp(theta) {
+  var t = theta % TAU; 
+  if (t < 0) {
+    t += TAU;
+  }
+  return t;
 }
 
 function f(t,z) {
@@ -168,6 +188,7 @@ function loop() {
   }
 
   rot += rotVel;
+  rot = clamp(rot);
   rotAcc = 0;
 
   bada.tick(elapsed);
@@ -178,7 +199,7 @@ function loop() {
   w = f(rot,zz);
 
   c.save();
-  c.rotate(rot + Math.PI);
+  c.rotate(rot);
   c.translate(Math.cos(rot)*w,Math.sin(rot)*w);
   c.rotate(tangentAngle(rot,zz));
   c.fillStyle='red';
