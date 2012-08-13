@@ -42,7 +42,7 @@
       // --b-D--
       // -D---b-
       // -b---D-
-      var dist = this.angle - rot;
+      var dist = this.angle - guy.angle;
       if (dist < Math.PI) {
         speed *= (dist < 0) ? 1 : -1;
       } else {
@@ -52,7 +52,7 @@
       this.angle += speed;
       this.angle = clamp(this.angle);
 
-      this.dist = f(this.angle, zz);
+      this.dist = f(this.angle);
       this.rot = tangentAngle(this.angle,zz);
     },
     render: function (c) {
@@ -66,6 +66,24 @@
       c.lineTo(10 - this.ani, 0);
       c.lineTo(0, 8 + this.ani);
       c.closePath();
+      c.restore();
+    }
+  };
+
+  var Guy = function () {
+  };
+
+  Guy.prototype = {
+    tick: function (delta) {
+      this.dist = f(this.angle);
+    },
+    render: function (c) {
+      c.save();
+      c.rotate(this.angle);
+      c.translate(Math.cos(this.angle)*this.dist,Math.sin(this.angle)*this.dist);
+      c.rotate(tangentAngle(this.angle,zz));
+      c.fillStyle='red';
+      c.fillRect(-10, -10, 20, 20);
       c.restore();
     }
   };
@@ -101,10 +119,10 @@
     c.save();
     c.rotate(rot);
     c.strokeStyle='black';
-    i=0;
+    var i=0;
     c.moveTo(f(0,z),0);
     while (i<TAU) {
-      w = f(i,z);
+      var w = f(i,z);
       c.lineTo(Math.cos(i)*w,Math.sin(i)*w);
       i+=step;
     }
@@ -125,14 +143,15 @@
   }
 
   function f(t,z) {
+    z = z ? z : zz;
     return Math.sin(t * z) * maxRadius;
   }
 
-  function tangentAngle(t,z) {
-    var t1 = f(t,z);
+  function tangentAngle(t) {
+    var t1 = f(t);
     var x1 = Math.cos(t)*t1;
     var y1 = Math.sin(t)*t1;
-    var t2 = f(t+step,z);
+    var t2 = f(t+step);
     var x2 = Math.cos(t+step)*t2;
     var y2 = Math.sin(t+step)*t2;
     x = x2 - x1;
@@ -153,6 +172,9 @@
   var secondCounter = 0;
   var lastFramerate = 0;
   var currentFramerate = 0;
+
+  var guy = new Guy();
+  guy.angle = 0;
 
   var bada = new Bada();
   bada.angle = 1 + Math.PI/2;
@@ -207,20 +229,16 @@
     rot = clamp(rot);
     rotAcc = 0;
 
+    renderLine(f,zz,rot);
+
+    // bada is rendered offset when the line moves
     bada.tick(elapsed);
     bada.render(c);
 
-    renderLine(f,zz,rot);
-
-    var w = f(rot,zz);
-
-    c.save();
-    c.rotate(rot);
-    c.translate(Math.cos(rot)*w,Math.sin(rot)*w);
-    c.rotate(tangentAngle(rot,zz));
-    c.fillStyle='red';
-    c.fillRect(-10, -10, 20, 20);
-    c.restore();
+    // but guy is not...
+    guy.angle = rot;
+    guy.tick(elapsed);
+    guy.render(c);
 
     if (running) {
       requestAnimFrame(loop, canvas);
