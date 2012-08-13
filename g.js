@@ -165,10 +165,6 @@
     c.restore();
   }
 
-  function translate(theta,dist) {
-    c.translate(Math.cos(theta + rot)*dist, Math.sin(theta + rot)*dist);
-  }
-
   function clamp(theta) {
     var t = theta % TAU; 
     if (t < 0) {
