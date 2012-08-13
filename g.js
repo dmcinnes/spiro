@@ -77,6 +77,8 @@
   Guy.prototype = {
     tick: function (delta) {
       this.dist = f(this.angle);
+      this.path = [-15, 0, -10, -8, -5, -8, -2, -10, -2, -8, 2, -8, 2, -10, 5, -8, 10, -8, 15, 0, 10, 8, 5, 8, 2, 10, 2, 8, -2, 8, -2, 10, -5, 8, -10, 8, -15, 0];
+      this.pathLength = this.path.length/2;
     },
     render: function (c) {
       c.save();
@@ -84,19 +86,16 @@
       c.translate(Math.cos(this.angle)*this.dist,Math.sin(this.angle)*this.dist);
       c.rotate(tangentAngle(this.angle,zz));
       c.beginPath();
-      c.moveTo(-15, 0);
-      c.lineTo(-10, -10);
-      c.lineTo(10, -10);
-      c.lineTo(15, 0);
-      c.lineTo(10, 10);
-      c.lineTo(-10, 10);
-      c.lineTo(-15, 0);
+      c.moveTo(this.path[0], this.path[1]);
+      for (var i = 1; i < this.pathLength; i++) {
+        c.lineTo(this.path[2*i], this.path[2*i+1]);
+      }
       c.closePath();
       c.fillStyle='black';
       c.fill();
       c.stroke();
       c.fillStyle='red';
-      c.fillRect(-10, -10, 20, 20);
+      c.fillRect(-10, -7, 20, 14);
       c.restore();
     }
   };
