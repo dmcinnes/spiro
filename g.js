@@ -186,11 +186,15 @@
   var lastFramerate = 0;
   var currentFramerate = 0;
 
+  var sprites = [];
+
   var guy = new Guy();
   guy.angle = 0;
+  sprites.push(guy);
 
   var bada = new Bada();
   bada.angle = 1 + Math.PI/2;
+  sprites.push(bada);
 
   function loop() {
     var thisFrame = timestamp();
@@ -242,14 +246,15 @@
     rot = clamp(rot);
     rotAcc = 0;
 
+    guy.angle = rot;
+
     renderLine(f,zz,rot);
 
-    bada.tick(elapsed);
-    bada.render(c);
-
-    guy.angle = rot;
-    guy.tick(elapsed);
-    guy.render(c);
+    var spriteCount = sprites.length;
+    for (var i = 0; i < spriteCount; i++) {
+      sprites[i].tick(elapsed);
+      sprites[i].render(c);
+    }
 
     if (running) {
       requestAnimFrame(loop, canvas);
