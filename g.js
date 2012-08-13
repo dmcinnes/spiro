@@ -42,23 +42,20 @@
       // --b-D--
       // -D---b-
       // -b---D-
-      var dist = this.angle - guy.angle;
+      var dist = this.angle - rot;
       if (dist < Math.PI) {
         speed *= (dist < 0) ? 1 : -1;
       } else {
         speed *= (dist > 0) ? 1 : -1;
       }
 
-      this.angle += speed;
-      this.angle = clamp(this.angle);
+      this.angle = clamp(this.angle + speed);
 
       this.dist = f(this.angle);
       this.rot = tangentAngle(this.angle,zz);
     },
     render: function (c) {
-      c.save();
-      translate(this.angle, this.dist);
-      c.rotate(this.rot + rot);
+      c.rotate(this.rot);
       c.beginPath();
       c.strokeStyle='blue';
       c.moveTo(-10 + this.ani, 0);
@@ -67,23 +64,39 @@
       c.lineTo(0, 8 + this.ani);
       c.closePath();
       c.stroke();
-      c.restore();
     }
   };
 
   var Guy = function () {
+    this.angle = 0;
   };
-
   Guy.prototype = {
+    path: [-15,   0,
+           -10,  -8,
+            -5,  -8,
+            -2, -10,
+            -2,  -8,
+             2,  -8,
+             2, -10,
+             5,  -8,
+            10,  -8,
+            15,   0,
+            10,   8,
+             5,   8,
+             2,  10,
+             2,   8,
+            -2,   8,
+            -2,  10,
+            -5,   8,
+           -10,   8,
+           -15,   0],
+
     tick: function (delta) {
       this.dist = f(this.angle);
-      this.path = [-15, 0, -10, -8, -5, -8, -2, -10, -2, -8, 2, -8, 2, -10, 5, -8, 10, -8, 15, 0, 10, 8, 5, 8, 2, 10, 2, 8, -2, 8, -2, 10, -5, 8, -10, 8, -15, 0];
       this.pathLength = this.path.length/2;
     },
+
     render: function (c) {
-      c.save();
-      c.rotate(this.angle);
-      c.translate(Math.cos(this.angle)*this.dist,Math.sin(this.angle)*this.dist);
       c.rotate(tangentAngle(this.angle,zz));
       c.beginPath();
       c.moveTo(this.path[0], this.path[1]);
@@ -96,7 +109,15 @@
       c.stroke();
       c.fillStyle='red';
       c.fillRect(-10, -7, 20, 14);
-      c.restore();
+    }
+  };
+
+  var Bullet = function () {
+  };
+  Bullet.prototype = {
+    tick: function (delta) {
+    },
+    render: function (c) {
     }
   };
 
@@ -108,6 +129,7 @@
   }
 
   var KEY_CODES = {
+    88: 'x',
     37: 'left',
     38: 'up',
     39: 'right',
@@ -189,7 +211,6 @@
   var sprites = [];
 
   var guy = new Guy();
-  guy.angle = 0;
   sprites.push(guy);
 
   var bada = new Bada();
@@ -250,11 +271,22 @@
 
     renderLine(f,zz,rot);
 
+    c.save();
+    c.rotate(rot);
+
     var spriteCount = sprites.length;
     for (var i = 0; i < spriteCount; i++) {
-      sprites[i].tick(elapsed);
-      sprites[i].render(c);
+      var sprite = sprites[i];
+
+      sprite.tick(elapsed);
+
+      c.save();
+      c.translate(Math.cos(sprite.angle)*sprite.dist,Math.sin(sprite.angle)*sprite.dist);
+      sprite.render(c);
+      c.restore();
     }
+
+    c.restore();
 
     if (running) {
       requestAnimFrame(loop, canvas);
