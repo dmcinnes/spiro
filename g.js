@@ -66,6 +66,7 @@
       c.lineTo(10 - this.ani, 0);
       c.lineTo(0, 8 + this.ani);
       c.closePath();
+      c.stroke();
       c.restore();
     }
   };
@@ -82,6 +83,18 @@
       c.rotate(this.angle);
       c.translate(Math.cos(this.angle)*this.dist,Math.sin(this.angle)*this.dist);
       c.rotate(tangentAngle(this.angle,zz));
+      c.beginPath();
+      c.moveTo(-15, 0);
+      c.lineTo(-10, -10);
+      c.lineTo(10, -10);
+      c.lineTo(15, 0);
+      c.lineTo(10, 10);
+      c.lineTo(-10, 10);
+      c.lineTo(-15, 0);
+      c.closePath();
+      c.fillStyle='black';
+      c.fill();
+      c.stroke();
       c.fillStyle='red';
       c.fillRect(-10, -10, 20, 20);
       c.restore();
@@ -118,14 +131,15 @@
   function renderLine(f,z,rot) {
     c.save();
     c.rotate(rot);
-    c.strokeStyle='black';
     var i=0;
+    c.beginPath();
     c.moveTo(f(0,z),0);
     while (i<TAU) {
       var w = f(i,z);
       c.lineTo(Math.cos(i)*w,Math.sin(i)*w);
       i+=step;
     }
+    c.strokeStyle='black';
     c.stroke();
     c.restore();
   }
@@ -231,11 +245,9 @@
 
     renderLine(f,zz,rot);
 
-    // bada is rendered offset when the line moves
     bada.tick(elapsed);
     bada.render(c);
 
-    // but guy is not...
     guy.angle = rot;
     guy.tick(elapsed);
     guy.render(c);
