@@ -29,21 +29,21 @@ running = true;
 
 Bada = function () {
   this.ani = 0;
-  this.r = 0;
+  this.dist = 0;
 };
 Bada.prototype = {
   tick: function (delta) {
     this.ani += delta / 100;
     this.ani %= 5;
 
-    this.t += delta / 12000;
+    this.angle += delta / 12000;
 
-    this.r = f(this.t,zz);
-    this.rot = tangentAngle(this.t,zz);
+    this.dist = f(this.angle, zz);
+    this.rot = tangentAngle(this.angle,zz);
   },
   render: function (c) {
     c.save();
-    translate(this.t, this.r);
+    translate(this.angle, this.dist);
     c.rotate(this.rot + rot);
     c.beginPath();
     c.strokeStyle='blue';
@@ -98,8 +98,8 @@ function renderLine(f,z,rot) {
   c.restore();
 }
 
-function translate(t,r) {
-  c.translate(Math.cos(t + rot)*r, Math.sin(t + rot)*r);
+function translate(theta,dist) {
+  c.translate(Math.cos(theta + rot)*dist, Math.sin(theta + rot)*dist);
 }
 
 function f(t,z) {
@@ -129,7 +129,7 @@ rot = 0;
 maxRot = 0.04;
 
 bada = new Bada();
-bada.t = 1 + Math.PI/2;
+bada.angle = 1 + Math.PI/2;
 
 function loop() {
   thisFrame = timestamp();
