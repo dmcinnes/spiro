@@ -29,6 +29,13 @@
   var step = TAU/360;
   var running = true;
 
+  function updateSpriteCartesian(sprite) {
+    if (sprite.angle) {
+      sprite.x = Math.cos(sprite.angle)*sprite.dist;
+      sprite.y = Math.sin(sprite.angle)*sprite.dist;
+    }
+  }
+
   var Bada = function () {
     this.ani = 0;
     this.dist = 0;
@@ -113,11 +120,19 @@
   };
 
   var Bullet = function () {
+    this.rot = 0;
   };
   Bullet.prototype = {
     tick: function (delta) {
+      this.rot++;
+      this.x += this.velX * delta / 1000;
+      this.y += this.velY * delta / 1000;
     },
     render: function (c) {
+      c.translate(this.x, this.y);
+      c.rotate(this.rot);
+      c.fillStyle='black';
+      c.fillRect(-1,-1,2,2);
     }
   };
 
@@ -204,6 +219,12 @@
   var lastFramerate = 0;
   var currentFramerate = 0;
 
+  var bullets = [
+    new Bullet(),
+    new Bullet(),
+    new Bullet()
+  ];
+
   var sprites = [];
 
   var guy = new Guy();
@@ -252,6 +273,16 @@
       if (KEYS.space) {
         rotAcc = -rotVel / 10;
       }
+      if (KEYS.x) {
+        if (bullets.length > 0) {
+          var bullet = bullets.pop();
+          bullet.x = guy.x;
+          bullet.y = guy.y;
+          bullet.velX = Math.cos(guy.angle);
+          bullet.velY = Math.sin(guy.angle);
+          sprites.push(bullet);
+        }
+      }
     }
 
     rotVel += rotAcc;
@@ -275,9 +306,10 @@
       var sprite = sprites[i];
 
       sprite.tick(elapsed);
+      updateSpriteCartesian(sprite);
 
       c.save();
-      c.translate(Math.cos(sprite.angle)*sprite.dist,Math.sin(sprite.angle)*sprite.dist);
+      c.translate(sprite.x, sprite.y);
       sprite.render(c);
       c.restore();
     }
