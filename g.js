@@ -104,12 +104,13 @@
     tick: function (delta) {
       this.dist = f(this.angle);
       this.pathLength = this.path.length/2;
+      this.rot = tangentAngle(this.angle);
       updateSpriteCartesian(this);
     },
 
     render: function (c) {
       c.translate(this.x, this.y);
-      c.rotate(rot + tangentAngle(this.angle));
+      c.rotate(rot + this.rot);
       c.beginPath();
       c.moveTo(this.path[0], this.path[1]);
       for (var i = 1; i < this.pathLength; i++) {
@@ -130,14 +131,14 @@
   Bullet.prototype = {
     tick: function (delta) {
       this.rot++;
-      this.x += this.velX * delta / 100;
-      this.y += this.velY * delta / 100;
+      this.x += this.velX * delta / 2;
+      this.y += this.velY * delta / 2;
     },
     render: function (c) {
       c.translate(this.x, this.y);
       c.rotate(this.rot);
       c.fillStyle='black';
-      c.fillRect(-1,-1,2,2);
+      c.fillRect(-3,-3,4,4);
     }
   };
 
@@ -224,6 +225,8 @@
   var lastFramerate = 0;
   var currentFramerate = 0;
 
+  var BULLET_FIRE_TIMEOUT = 200;
+  var currentBulletFireTimeout = 0;
   var bullets = [
     new Bullet(),
     new Bullet(),
@@ -279,12 +282,16 @@
         rotAcc = -rotVel / 10;
       }
       if (KEYS.x) {
-        if (bullets.length > 0) {
+        currentBulletFireTimeout -= elapsed;
+        if (bullets.length > 0 &&
+            currentBulletFireTimeout < 0) {
+          currentBulletFireTimeout = BULLET_FIRE_TIMEOUT;
           var bullet = bullets.pop();
           bullet.x = guy.x;
           bullet.y = guy.y;
-          bullet.velX = Math.cos(guy.angle);
-          bullet.velY = Math.sin(guy.angle);
+          var angle = guy.rot + rot - Math.PI/2;
+          bullet.velX = Math.cos(angle);
+          bullet.velY = Math.sin(angle);
           sprites.push(bullet);
         }
       }
