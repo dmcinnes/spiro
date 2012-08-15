@@ -31,8 +31,8 @@
 
   function updateSpriteCartesian(sprite) {
     if (sprite.angle) {
-      sprite.x = Math.cos(sprite.angle)*sprite.dist;
-      sprite.y = Math.sin(sprite.angle)*sprite.dist;
+      sprite.x = Math.cos(rot + sprite.angle)*sprite.dist;
+      sprite.y = Math.sin(rot + sprite.angle)*sprite.dist;
     }
   }
 
@@ -59,10 +59,13 @@
       this.angle = clamp(this.angle + speed);
 
       this.dist = f(this.angle);
-      this.rot = tangentAngle(this.angle,zz);
+      this.rot = tangentAngle(this.angle);
+
+      updateSpriteCartesian(this);
     },
     render: function (c) {
-      c.rotate(this.rot);
+      c.translate(this.x, this.y);
+      c.rotate(rot + this.rot);
       c.beginPath();
       c.strokeStyle='blue';
       c.moveTo(-10 + this.ani, 0);
@@ -101,10 +104,12 @@
     tick: function (delta) {
       this.dist = f(this.angle);
       this.pathLength = this.path.length/2;
+      updateSpriteCartesian(this);
     },
 
     render: function (c) {
-      c.rotate(tangentAngle(this.angle,zz));
+      c.translate(this.x, this.y);
+      c.rotate(rot + tangentAngle(this.angle));
       c.beginPath();
       c.moveTo(this.path[0], this.path[1]);
       for (var i = 1; i < this.pathLength; i++) {
@@ -125,8 +130,8 @@
   Bullet.prototype = {
     tick: function (delta) {
       this.rot++;
-      this.x += this.velX * delta / 1000;
-      this.y += this.velY * delta / 1000;
+      this.x += this.velX * delta / 100;
+      this.y += this.velY * delta / 100;
     },
     render: function (c) {
       c.translate(this.x, this.y);
@@ -298,23 +303,16 @@
 
     renderLine(f,zz,rot);
 
-    c.save();
-    c.rotate(rot);
-
     var spriteCount = sprites.length;
     for (var i = 0; i < spriteCount; i++) {
       var sprite = sprites[i];
 
       sprite.tick(elapsed);
-      updateSpriteCartesian(sprite);
 
       c.save();
-      c.translate(sprite.x, sprite.y);
       sprite.render(c);
       c.restore();
     }
-
-    c.restore();
 
     if (running) {
       requestAnimFrame(loop, canvas);
