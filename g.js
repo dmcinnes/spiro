@@ -29,8 +29,11 @@
   c.lineWidth = 2;
   var step = TAU/360;
   var running = true;
+  var tailSprite = null;
+  var headSprite = null;
 
   var SpritePrototype = {
+    prevSprite: null,
     nextSprite: null,
     outside: function () {
       return this.x > gameWidth ||
@@ -43,6 +46,30 @@
         this.x = Math.cos(rot + this.angle) * this.dist;
         this.y = Math.sin(rot + this.angle) * this.dist;
       }
+    },
+    add: function () {
+      if (tailSprite) {
+        tailSprite.nextSprite = this;
+        this.prevSprite = tailSprite;
+      } else {
+        headSprite = this;
+      }
+      tailSprite = this;
+    },
+    remove: function () {
+      if (this.prevSprite) {
+        this.prevSprite.nextSprite = this.nextSprite;
+      } else {
+        headSprite = this.nextSprite;
+      }
+      if (this.nextSprite) {
+        this.nextSprite.prevSprite = this.prevSprite;
+      } else {
+        tailSprite = this.prevSprite;
+      }
+      // clear for further use
+      this.prevSprite = null;
+      this.nextSprite = null;
     }
   };
 
@@ -151,6 +178,10 @@
       this.rot++;
       this.x += this.velX * delta / 2;
       this.y += this.velY * delta / 2;
+      if (this.outside()) {
+        this.remove();
+        freeBullets.push(this);
+      }
     },
     render: function (c) {
       c.translate(this.x, this.y);
@@ -246,18 +277,18 @@
 
   var BULLET_FIRE_TIMEOUT = 200;
   var currentBulletFireTimeout = 0;
-  var bullets = [
+  var freeBullets = [
     new Bullet(),
     new Bullet(),
     new Bullet()
   ];
 
   var guy = new Guy();
+  guy.add();
 
   var bada = new Bada();
   bada.angle = 1 + Math.PI/2;
-
-  var sprites = [guy, bada];
+  bada.add();
 
   function loop() {
     var thisFrame = timestamp();
@@ -300,16 +331,16 @@
       }
       if (KEYS.x) {
         currentBulletFireTimeout -= elapsed;
-        if (bullets.length > 0 &&
+        if (freeBullets.length > 0 &&
             currentBulletFireTimeout < 0) {
           currentBulletFireTimeout = BULLET_FIRE_TIMEOUT;
-          var bullet = bullets.pop();
+          var bullet = freeBullets.pop();
           bullet.x = guy.x;
           bullet.y = guy.y;
           var angle = guy.rot + rot - Math.PI/2;
           bullet.velX = Math.cos(angle);
           bullet.velY = Math.sin(angle);
-          sprites.push(bullet);
+          bullet.add();
         }
       }
     }
@@ -327,15 +358,15 @@
 
     renderLine(f,zz,rot);
 
-    var spriteCount = sprites.length;
-    for (var i = 0; i < spriteCount; i++) {
-      var sprite = sprites[i];
-
+    var sprite = headSprite;
+    while (sprite) {
       sprite.tick(elapsed);
 
       c.save();
       sprite.render(c);
       c.restore();
+
+      sprite = sprite.nextSprite;
     }
 
     if (running) {
