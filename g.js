@@ -73,9 +73,12 @@
     }
   };
 
+  // add the sprite methods to the prototype
   var Sprite = function (proto) {
     for (var method in SpritePrototype) {
-      proto.prototype[method] = SpritePrototype[method];
+      if (SpritePrototype.hasOwnProperty(method)) {
+        proto.prototype[method] = SpritePrototype[method];
+      }
     }
   };
 
