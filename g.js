@@ -202,7 +202,7 @@
       c.translate(this.x, this.y);
       c.rotate(this.rot);
       c.fillStyle='black';
-      c.fillRect(-3,-3,4,4);
+      c.fillRect(-4,-4,8,8);
     }
   };
   Sprite(Bullet);
