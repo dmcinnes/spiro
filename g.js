@@ -85,6 +85,7 @@
   var Bada = function () {
     this.ani = 0;
     this.dist = 0;
+    this.scale = 0.1;
   };
   Bada.prototype = {
     tick: function (delta) {
@@ -102,6 +103,12 @@
         speed *= (dist > 0) ? 1 : -1;
       }
 
+      if (this.scale < 1) {
+        this.scale += delta / 1000;
+      } else if (this.scale > 1) {
+        this.scale = 1;
+      }
+
       this.angle = clamp(this.angle + speed);
 
       this.dist = f(this.angle);
@@ -112,8 +119,10 @@
     render: function (c) {
       c.translate(this.x, this.y);
       c.rotate(rot + this.rot);
+      c.scale(this.scale, this.scale);
       c.beginPath();
       c.strokeStyle='blue';
+      c.lineWidth = 3/this.scale;
       c.moveTo(-10 + this.ani, 0);
       c.lineTo(0, -8 - this.ani);
       c.lineTo(10 - this.ani, 0);
