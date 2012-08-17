@@ -21,7 +21,8 @@
   }
 
   var TAU = 2*Math.PI;
-  var maxRadius = 300;
+  var gameWidth = 600;
+  var maxRadius = gameWidth / 2;
   var canvas = document.getElementById('c');
   var c = canvas.getContext('2d');
   c.translate(305,305);
@@ -29,12 +30,27 @@
   var step = TAU/360;
   var running = true;
 
-  function updateSpriteCartesian(sprite) {
-    if (sprite.angle) {
-      sprite.x = Math.cos(rot + sprite.angle)*sprite.dist;
-      sprite.y = Math.sin(rot + sprite.angle)*sprite.dist;
+  var SpritePrototype = {
+    nextSprite: null,
+    outside: function () {
+      return this.x > gameWidth ||
+             this.x < 0 ||
+             this.y > gameWidth ||
+             this.y < 0;
+    },
+    updateSpriteCartesian: function () {
+      if (this.angle) {
+        this.x = Math.cos(rot + this.angle) * this.dist;
+        this.y = Math.sin(rot + this.angle) * this.dist;
+      }
     }
-  }
+  };
+
+  var Sprite = function (proto) {
+    for (var method in SpritePrototype) {
+      proto.prototype[method] = SpritePrototype[method];
+    }
+  };
 
   var Bada = function () {
     this.ani = 0;
@@ -61,7 +77,7 @@
       this.dist = f(this.angle);
       this.rot = tangentAngle(this.angle);
 
-      updateSpriteCartesian(this);
+      this.updateSpriteCartesian();
     },
     render: function (c) {
       c.translate(this.x, this.y);
@@ -76,6 +92,7 @@
       c.stroke();
     }
   };
+  Sprite(Bada);
 
   var Guy = function () {
     this.angle = 0;
@@ -105,7 +122,7 @@
       this.dist = f(this.angle);
       this.pathLength = this.path.length/2;
       this.rot = tangentAngle(this.angle);
-      updateSpriteCartesian(this);
+      this.updateSpriteCartesian();
     },
 
     render: function (c) {
@@ -124,6 +141,7 @@
       c.fillRect(-10, -7, 20, 14);
     }
   };
+  Sprite(Guy);
 
   var Bullet = function () {
     this.rot = 0;
@@ -141,6 +159,7 @@
       c.fillRect(-3,-3,4,4);
     }
   };
+  Sprite(Bullet);
 
   function pause() {
     running = !running;
@@ -233,14 +252,12 @@
     new Bullet()
   ];
 
-  var sprites = [];
-
   var guy = new Guy();
-  sprites.push(guy);
 
   var bada = new Bada();
   bada.angle = 1 + Math.PI/2;
-  sprites.push(bada);
+
+  var sprites = [guy, bada];
 
   function loop() {
     var thisFrame = timestamp();
