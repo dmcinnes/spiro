@@ -328,7 +328,7 @@
     lastFrame = thisFrame;
     c.clearRect(-305, -305, 610, 610);
     c.save();
-    c.translate(-200, -200);
+    c.translate(-280, -280);
     c.scale(2, 2);
     c.fillText(currentFramerate + lastFramerate, 0, 0);
     c.restore();
