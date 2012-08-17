@@ -123,6 +123,8 @@
 
   var Guy = function () {
     this.angle = 0;
+    this.x = 0;
+    this.y = 0;
   };
   Guy.prototype = {
     path: [-15,   0,
@@ -196,6 +198,23 @@
     running = !running;
     if (running) {
       loop();
+    }
+  }
+
+  function fire(direction) {
+    if (freeBullets.length) {
+      var bullet = freeBullets.pop();
+      bullet.x = guy.x;
+      bullet.y = guy.y;
+      var angle = guy.rot + rot;
+      if (direction === 'up') {
+        angle -= Math.PI/2;
+      } else {
+        angle -= 3*Math.PI/2;
+      }
+      bullet.velX = Math.cos(angle);
+      bullet.velY = Math.sin(angle);
+      bullet.add();
     }
   }
 
@@ -277,11 +296,10 @@
 
   var BULLET_FIRE_TIMEOUT = 150;
   var currentBulletFireTimeout = 0;
-  var freeBullets = [
-    new Bullet(),
-    new Bullet(),
-    new Bullet()
-  ];
+  var freeBullets = [];
+  for (var i = 0; i < 6; i++) {
+    freeBullets.push(new Bullet());
+  }
 
   var guy = new Guy();
   guy.add();
@@ -319,7 +337,6 @@
       zz += elapsed / 800;
     } else {
       zz = zzTarget;
-      // rotAcc += elapsed / 1000;
       if (KEYS.left) {
         rotAcc = -elapsed / 10000;
       }
@@ -331,16 +348,10 @@
       }
       if (KEYS.x) {
         currentBulletFireTimeout -= elapsed;
-        if (freeBullets.length > 0 &&
-            currentBulletFireTimeout < 0) {
+        if (currentBulletFireTimeout < 0) {
           currentBulletFireTimeout = BULLET_FIRE_TIMEOUT;
-          var bullet = freeBullets.pop();
-          bullet.x = guy.x;
-          bullet.y = guy.y;
-          var angle = guy.rot + rot - Math.PI/2;
-          bullet.velX = Math.cos(angle);
-          bullet.velY = Math.sin(angle);
-          bullet.add();
+          fire('up');
+          fire('down');
         }
       }
     }
