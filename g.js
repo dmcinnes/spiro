@@ -36,10 +36,10 @@
     prevSprite: null,
     nextSprite: null,
     outside: function () {
-      return this.x > gameWidth ||
-             this.x < 0 ||
-             this.y > gameWidth ||
-             this.y < 0;
+      return this.x > maxRadius  ||
+             this.x < -maxRadius ||
+             this.y > maxRadius  ||
+             this.y < -maxRadius;
     },
     updateSpriteCartesian: function () {
       if (this.angle) {
@@ -176,8 +176,8 @@
   Bullet.prototype = {
     tick: function (delta) {
       this.rot++;
-      this.x += this.velX * delta / 2;
-      this.y += this.velY * delta / 2;
+      this.x += this.velX * delta;
+      this.y += this.velY * delta;
       if (this.outside()) {
         this.remove();
         freeBullets.push(this);
@@ -275,7 +275,7 @@
   var lastFramerate = 0;
   var currentFramerate = 0;
 
-  var BULLET_FIRE_TIMEOUT = 200;
+  var BULLET_FIRE_TIMEOUT = 150;
   var currentBulletFireTimeout = 0;
   var freeBullets = [
     new Bullet(),
