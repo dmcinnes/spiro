@@ -155,6 +155,7 @@
       this.pathLength = this.path.length/2;
       this.rot = tangentAngle(this.angle);
       this.updateSpriteCartesian();
+      this.angle = rot;
     },
 
     render: function (c) {
@@ -367,8 +368,6 @@
     rot += rotVel;
     rot = clamp(rot);
     rotAcc = 0;
-
-    guy.angle = rot;
 
     renderLine(f,zz,rot);
 
