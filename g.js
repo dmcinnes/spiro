@@ -378,6 +378,11 @@
     rot = clamp(rot);
     rotAcc = 0;
 
+    var percent = zz/zzTarget;
+    c.save();
+    c.scale(percent, percent);
+    c.lineWidth = 2/percent;
+
     renderLine(f,zz,rot);
 
     var sprite = headSprite;
@@ -391,6 +396,7 @@
 
       sprite = sprite.nextSprite;
     }
+    c.restore();
 
     if (running) {
       requestAnimFrame(loop, canvas);
