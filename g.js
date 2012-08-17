@@ -382,7 +382,8 @@
 
     var sprite = headSprite;
     while (sprite) {
-      sprite.tick(elapsed);
+      // tick with 0 until the game really starts
+      sprite.tick((zz === zzTarget) ? elapsed : 0);
 
       c.save();
       sprite.render(c);
