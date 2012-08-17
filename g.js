@@ -91,7 +91,7 @@
     tick: function (delta) {
       this.ani += delta / 100;
       this.ani %= 5;
-      var speed = delta / 12000;
+      var speed = delta / 10000;
       // --D-b--
       // --b-D--
       // -D---b-
@@ -293,6 +293,14 @@
     return Math.atan2(y, x); // radians
   }
 
+  function addBada(position, length) {
+    for (var i = 0; i < length; i++) {
+      var bada = new Bada();
+      bada.angle = position + i/20;
+      bada.ani = i;
+      bada.add();
+    }
+  }
 
   var offset = 0;
   var zz = 0;
@@ -317,9 +325,7 @@
   var guy = new Guy();
   guy.add();
 
-  var bada = new Bada();
-  bada.angle = 1 + Math.PI/2;
-  bada.add();
+  addBada(1, 5);
 
   function loop() {
     var thisFrame = timestamp();
