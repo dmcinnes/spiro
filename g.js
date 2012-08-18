@@ -36,6 +36,13 @@
   var running = true;
   var tailSprite = null;
   var headSprite = null;
+  var currentLevel = 0;
+
+  var levels = [{
+    f: function (t) {
+      return Math.sin(t * zz) * maxRadius;
+    }
+  }];
 
   var SpritePrototype = {
     prevSprite: null,
@@ -126,7 +133,7 @@
 
       this.angle = clamp(this.angle + speed);
 
-      this.dist = f(this.angle);
+      this.dist = currentf(this.angle);
       this.rot = tangentAngle(this.angle);
 
       this.updateSpriteCartesian();
@@ -179,7 +186,7 @@
            -15,   0],
 
     tick: function (delta) {
-      this.dist = f(this.angle);
+      this.dist = currentf(this.angle);
       this.pathLength = this.path.length/2;
       this.rot = tangentAngle(this.angle);
       this.updateSpriteCartesian();
@@ -371,16 +378,11 @@
     return t;
   }
 
-  function f(t,z) {
-    z = z ? z : zz;
-    return Math.sin(t * z) * maxRadius;
-  }
-
   function tangentAngle(theta) {
-    var t1 = f(theta);
+    var t1 = currentf(theta);
     var x1 = Math.cos(theta)*t1;
     var y1 = Math.sin(theta)*t1;
-    var t2 = f(theta+step);
+    var t2 = currentf(theta+step);
     var x2 = Math.cos(theta+step)*t2;
     var y2 = Math.sin(theta+step)*t2;
     x = x2 - x1;
@@ -416,6 +418,8 @@
   for (var i = 0; i < 6; i++) {
     freeBullets.push(new Bullet());
   }
+
+  var currentf = levels[currentLevel].f;
 
   var guy = new Guy();
   guy.add();
@@ -484,7 +488,7 @@
     c.scale(percent, percent);
     c.lineWidth = 2/percent;
 
-    renderLine(f,zz,rot);
+    renderLine(currentf,zz,rot);
 
     var sprite = headSprite;
     while (sprite) {
