@@ -1,5 +1,9 @@
 (function () {
 
+  var GUY    = 1;
+  var BULLET = 2;
+  var BADA   = 4;
+
   requestAnimFrame = (function () {
     return  window.requestAnimationFrame ||
       window.webkitRequestAnimationFrame ||
@@ -70,13 +74,19 @@
       // clear for further use
       this.prevSprite = null;
       this.nextSprite = null;
+    },
+    distance: function (other) {
+      return Math.sqrt(Math.pow(this.x - other.x,2) + Math.pow(this.y - other.y,2));
+    },
+    collide: function (other) {
     }
   };
 
   // add the sprite methods to the prototype
   var Sprite = function (proto) {
     for (var method in SpritePrototype) {
-      if (SpritePrototype.hasOwnProperty(method)) {
+      if (SpritePrototype.hasOwnProperty(method) &&
+          !proto.prototype[method]) {
         proto.prototype[method] = SpritePrototype[method];
       }
     }
@@ -129,7 +139,11 @@
       c.lineTo(0, 8 + this.ani);
       c.closePath();
       c.stroke();
-    }
+    },
+
+    type: BADA,
+
+    collidesWith: BULLET + GUY
   };
   Sprite(Bada);
 
@@ -181,7 +195,11 @@
       c.stroke();
       c.fillStyle='red';
       c.fillRect(-10, -7, 20, 14);
-    }
+    },
+
+    type: GUY,
+
+    collidesWith: BADA
   };
   Sprite(Guy);
 
@@ -195,7 +213,6 @@
       this.y += this.velY * delta;
       if (this.outside()) {
         this.remove();
-        freeBullets.push(this);
       }
     },
     render: function (c) {
@@ -203,9 +220,33 @@
       c.rotate(this.rot);
       c.fillStyle='black';
       c.fillRect(-4,-4,8,8);
-    }
+    },
+    remove: function () {
+      freeBullets.push(this);
+      SpritePrototype.remove.apply(this);
+    },
+    collide: function (other) {
+      other.remove();
+      this.remove();
+    },
+
+    type: BULLET,
+
+    collidesWith: BADA
   };
   Sprite(Bullet);
+
+  function checkCollisions(canidate) {
+    var sprite = headSprite;
+    while (sprite) {
+      if (sprite.type & canidate.collidesWith) {
+        if (sprite.distance(canidate) < 10) {
+          sprite.collide(canidate);
+        }
+      }
+      sprite = sprite.nextSprite;
+    }
+  }
 
   function pause() {
     running = !running;
@@ -399,6 +440,8 @@
       c.save();
       sprite.render(c);
       c.restore();
+
+      checkCollisions(sprite);
 
       sprite = sprite.nextSprite;
     }
