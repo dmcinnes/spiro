@@ -24,6 +24,7 @@
     timestamp = Date.now;
   }
 
+  // http://tauday.com/
   var TAU = 2*Math.PI;
   var gameWidth = 600;
   var maxRadius = gameWidth / 2;
@@ -234,6 +235,10 @@
     collide: function (other) {
       other.remove();
       this.remove();
+      var p = new Particles(5);
+      p.x = this.x;
+      p.y = this.y;
+      p.add();
     },
 
     type: BULLET,
@@ -241,6 +246,39 @@
     collidesWith: BADA
   };
   Sprite(Bullet);
+
+  var Particles = function (count) {
+    this.life = 0;
+    this.particleDirections = [];
+    for (var i=0; i < count; i++) {
+      var dir = Math.random() * TAU;
+      this.particleDirections.push(
+        Math.cos(dir),
+        Math.sin(dir)
+      );
+    }
+  };
+  Particles.prototype = {
+    tick: function (delta) {
+      this.life += delta;
+      if (this.life > 500) {
+        this.remove();
+      }
+    },
+    render: function (c) {
+      var count = this.particleDirections.length;
+      c.translate(this.x, this.y);
+      for (var i = 0; i < count; i+=2) {
+        var particleX = this.particleDirections[i];
+        var particleY = this.particleDirections[i+1];
+        c.save();
+        c.translate(particleX * this.life/8, particleY * this.life/8);
+        c.fillRect(0,0,2,2);
+        c.restore();
+      }
+    }
+  };
+  Sprite(Particles);
 
 
   ////////////////////////
