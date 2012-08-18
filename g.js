@@ -92,6 +92,10 @@
     }
   };
 
+  /////////////////
+  //// SPRITES ////
+  /////////////////
+
   var Bada = function () {
     this.ani = 0;
     this.dist = 0;
@@ -222,8 +226,10 @@
       c.fillRect(-4,-4,8,8);
     },
     remove: function () {
-      freeBullets.push(this);
+      // override the remove function
+      // call original
       SpritePrototype.remove.apply(this);
+      freeBullets.push(this);
     },
     collide: function (other) {
       other.remove();
@@ -236,41 +242,10 @@
   };
   Sprite(Bullet);
 
-  function checkCollisions(canidate) {
-    var sprite = headSprite;
-    while (sprite) {
-      if (sprite.type & canidate.collidesWith) {
-        if (sprite.distance(canidate) < 10) {
-          sprite.collide(canidate);
-        }
-      }
-      sprite = sprite.nextSprite;
-    }
-  }
 
-  function pause() {
-    running = !running;
-    if (running) {
-      loop();
-    }
-  }
-
-  function fire(direction) {
-    if (freeBullets.length) {
-      var bullet = freeBullets.pop();
-      bullet.x = guy.x;
-      bullet.y = guy.y;
-      var angle = guy.rot + rot;
-      if (direction === 'up') {
-        angle -= Math.PI/2;
-      } else {
-        angle -= 3*Math.PI/2;
-      }
-      bullet.velX = Math.cos(angle);
-      bullet.velY = Math.sin(angle);
-      bullet.add();
-    }
-  }
+  ////////////////////////
+  //// Input Handling ////
+  ////////////////////////
 
   var KEY_CODES = {
     88: 'x',
@@ -293,6 +268,46 @@
     KEYS[KEY_CODES[e.keyCode]] = false;
   }, false);
 
+  function checkCollisions(canidate) {
+    var sprite = headSprite;
+    while (sprite) {
+      // Compare this sprite's type against
+      // the canidate's bitmask.
+      // If it's non-zero the sprites can interact
+      if (sprite.type & canidate.collidesWith) {
+        // dumb distance comparison
+        if (sprite.distance(canidate) < 10) {
+          sprite.collide(canidate);
+        }
+      }
+      sprite = sprite.nextSprite;
+    }
+  }
+
+  function fire(direction) {
+    if (freeBullets.length) {
+      var bullet = freeBullets.pop();
+      bullet.x = guy.x;
+      bullet.y = guy.y;
+      var angle = guy.rot + rot;
+      if (direction === 'up') {
+        angle -= Math.PI/2;
+      } else {
+        angle -= 3*Math.PI/2;
+      }
+      bullet.velX = Math.cos(angle);
+      bullet.velY = Math.sin(angle);
+      bullet.add();
+    }
+  }
+
+  function pause() {
+    running = !running;
+    if (running) {
+      loop();
+    }
+  }
+
   function renderLine(f,z,rot) {
     c.save();
     c.rotate(rot);
@@ -309,6 +324,7 @@
     c.restore();
   }
 
+  // clamp theta to 0..2*PI
   function clamp(theta) {
     var t = theta % TAU; 
     if (t < 0) {
@@ -322,13 +338,13 @@
     return Math.sin(t * z) * maxRadius;
   }
 
-  function tangentAngle(t) {
-    var t1 = f(t);
-    var x1 = Math.cos(t)*t1;
-    var y1 = Math.sin(t)*t1;
-    var t2 = f(t+step);
-    var x2 = Math.cos(t+step)*t2;
-    var y2 = Math.sin(t+step)*t2;
+  function tangentAngle(theta) {
+    var t1 = f(theta);
+    var x1 = Math.cos(theta)*t1;
+    var y1 = Math.sin(theta)*t1;
+    var t2 = f(theta+step);
+    var x2 = Math.cos(theta+step)*t2;
+    var y2 = Math.sin(theta+step)*t2;
     x = x2 - x1;
     y = y2 - y1;
     return Math.atan2(y, x); // radians
