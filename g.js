@@ -399,6 +399,29 @@
     }
   }
 
+  var frameCallbacks = [];
+  function onFrame(callback) {
+    frameCallbacks.push(callback);
+  }
+
+  onFrame(function renderFramerate(delta) {
+    frameCount++;
+    secondCounter += delta;
+    if (secondCounter > 500) {
+      lastFramerate = currentFramerate;
+      currentFramerate = frameCount;
+      frameCount = 0;
+      secondCounter = 0;
+    }
+
+    c.save();
+    c.translate(-280, -280);
+    c.scale(2, 2);
+    c.fillText(currentFramerate + lastFramerate, 0, 0);
+    c.restore();
+  });
+
+
   var offset = 0;
   var zz = 0;
   var zzTarget = 2;
@@ -429,27 +452,11 @@
   function loop() {
     var thisFrame = timestamp();
     var elapsed = thisFrame - lastFrame;
-
-    frameCount++;
-    secondCounter += elapsed;
-    if (secondCounter > 500) {
-      lastFramerate = currentFramerate;
-      currentFramerate = frameCount;
-      frameCount = 0;
-      secondCounter = 0;
-    }
+    lastFrame = thisFrame;
 
     if (elapsed > 100) {
       elapsed = 100; // cap it at 10 FPS
     }
-
-    lastFrame = thisFrame;
-    c.clearRect(-305, -305, 610, 610);
-    c.save();
-    c.translate(-280, -280);
-    c.scale(2, 2);
-    c.fillText(currentFramerate + lastFramerate, 0, 0);
-    c.restore();
 
     if (zz < zzTarget) {
       zz += elapsed / 800;
@@ -483,6 +490,8 @@
     rot = clamp(rot);
     rotAcc = 0;
 
+    c.clearRect(-305, -305, 610, 610);
+
     var percent = zz/zzTarget;
     c.save();
     c.scale(percent, percent);
@@ -504,6 +513,11 @@
       sprite = sprite.nextSprite;
     }
     c.restore();
+
+    var callbackCount = frameCallbacks.length;
+    for (var i = 0; i < callbackCount; i++) {
+      frameCallbacks[i](elapsed);
+    }
 
     if (running) {
       requestAnimFrame(loop, canvas);
