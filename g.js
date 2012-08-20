@@ -303,14 +303,18 @@
 
   var KEYS = {};
 
+  var keyDown = false;
+
   window.addEventListener('keydown', function (e) {
     KEYS[KEY_CODES[e.keyCode]] = true;
     if (e.keyCode === 80) {
       pause();
     }
+    keyDown = true;
   }, false);
   window.addEventListener('keyup', function (e) {
     KEYS[KEY_CODES[e.keyCode]] = false;
+    keyDown = false;
   }, false);
 
   function checkCollisions(canidate) {
@@ -353,8 +357,25 @@
     }
   }
 
+  function integrateLine() {
+    rotVel += rotAcc;
+    if (Math.abs(rotVel) > maxRot) {
+      rotVel = maxRot * Math.abs(rotVel)/rotVel;
+    }
+
+    rot += rotVel;
+    rot = clamp(rot);
+    rotAcc = 0;
+  }
+
   function renderLine(f,z,rot) {
     c.save();
+
+    // scale it up
+    var percent = zz/zzTarget;
+    c.scale(percent, percent);
+    c.lineWidth = 2/percent;
+
     c.rotate(rot);
     var i=0;
     c.beginPath();
@@ -421,6 +442,41 @@
     c.restore();
   });
 
+  function handleControls(elapsed) {
+    if (KEYS.left) {
+      rotAcc = -elapsed / 10000;
+    }
+    if (KEYS.right) {
+      rotAcc = elapsed / 10000;
+    }
+    if (KEYS.space) {
+      rotAcc = -rotVel / 10;
+    }
+    if (KEYS.x) {
+      currentBulletFireTimeout -= elapsed;
+      if (currentBulletFireTimeout < 0) {
+        currentBulletFireTimeout = BULLET_FIRE_TIMEOUT;
+        fire('up');
+        fire('down');
+      }
+    }
+  }
+
+  function runSprites(elapsed) {
+    var sprite = headSprite;
+    while (sprite) {
+      // tick with 0 until the game really starts
+      sprite.tick((zz === zzTarget) ? elapsed : 0);
+
+      c.save();
+      sprite.render(c);
+      c.restore();
+
+      checkCollisions(sprite);
+
+      sprite = sprite.nextSprite;
+    }
+  }
 
   var offset = 0;
   var zz = 0;
@@ -449,6 +505,37 @@
 
   addBada(1, 5);
 
+  var states = {
+    waitToBegin: function () {
+      if (keyDown) {
+        currentState = states.startLevel;
+      }
+    },
+    startLevel: function (elapsed) {
+      if (zz < zzTarget) {
+        zz += elapsed / 800;
+      } else {
+        zz = zzTarget;
+        currentState = states.runLevel;
+      }
+      integrateLine();
+      renderLine(currentf,zz,rot);
+    },
+    runLevel: function (elapsed) {
+      handleControls(elapsed);
+      integrateLine();
+      renderLine(currentf,zz,rot);
+      runSprites(elapsed);
+    },
+    guyDie: function () {
+    },
+    finishLevel: function () {
+    },
+    outOfLives: function () {
+    }
+  };
+  var currentState = states.waitToBegin;
+
   function loop() {
     var thisFrame = timestamp();
     var elapsed = thisFrame - lastFrame;
@@ -458,61 +545,9 @@
       elapsed = 100; // cap it at 10 FPS
     }
 
-    if (zz < zzTarget) {
-      zz += elapsed / 800;
-    } else {
-      zz = zzTarget;
-      if (KEYS.left) {
-        rotAcc = -elapsed / 10000;
-      }
-      if (KEYS.right) {
-        rotAcc = elapsed / 10000;
-      }
-      if (KEYS.space) {
-        rotAcc = -rotVel / 10;
-      }
-      if (KEYS.x) {
-        currentBulletFireTimeout -= elapsed;
-        if (currentBulletFireTimeout < 0) {
-          currentBulletFireTimeout = BULLET_FIRE_TIMEOUT;
-          fire('up');
-          fire('down');
-        }
-      }
-    }
-
-    rotVel += rotAcc;
-    if (Math.abs(rotVel) > maxRot) {
-      rotVel = maxRot * Math.abs(rotVel)/rotVel;
-    }
-
-    rot += rotVel;
-    rot = clamp(rot);
-    rotAcc = 0;
-
     c.clearRect(-305, -305, 610, 610);
 
-    var percent = zz/zzTarget;
-    c.save();
-    c.scale(percent, percent);
-    c.lineWidth = 2/percent;
-
-    renderLine(currentf,zz,rot);
-
-    var sprite = headSprite;
-    while (sprite) {
-      // tick with 0 until the game really starts
-      sprite.tick((zz === zzTarget) ? elapsed : 0);
-
-      c.save();
-      sprite.render(c);
-      c.restore();
-
-      checkCollisions(sprite);
-
-      sprite = sprite.nextSprite;
-    }
-    c.restore();
+    currentState(elapsed);
 
     var callbackCount = frameCallbacks.length;
     for (var i = 0; i < callbackCount; i++) {
