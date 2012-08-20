@@ -420,12 +420,8 @@
     }
   }
 
-  var frameCallbacks = [];
-  function onFrame(callback) {
-    frameCallbacks.push(callback);
-  }
 
-  onFrame(function renderFramerate(delta) {
+  function renderFramerate(delta) {
     frameCount++;
     secondCounter += delta;
     if (secondCounter > 500) {
@@ -440,7 +436,7 @@
     c.scale(2, 2);
     c.fillText(currentFramerate + lastFramerate, 0, 0);
     c.restore();
-  });
+  }
 
   function handleControls(elapsed) {
     if (KEYS.left) {
@@ -549,10 +545,7 @@
 
     currentState(elapsed);
 
-    var callbackCount = frameCallbacks.length;
-    for (var i = 0; i < callbackCount; i++) {
-      frameCallbacks[i](elapsed);
-    }
+    renderFramerate(elapsed);
 
     if (running) {
       requestAnimFrame(loop, canvas);
