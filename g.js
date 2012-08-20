@@ -24,8 +24,7 @@
     timestamp = Date.now;
   }
 
-  // http://tauday.com/
-  var TAU = 2*Math.PI;
+  var TAU = 2*Math.PI; // http://tauday.com/
   var gameWidth = 600;
   var maxRadius = gameWidth / 2;
   var canvas = document.getElementById('c');
@@ -36,13 +35,30 @@
   var running = true;
   var tailSprite = null;
   var headSprite = null;
-  var currentLevel = 0;
+  var zz = 0;
+  var zzTarget = 2;
+  var lastFrame = timestamp();
+  var rotAcc = 0;
+  var rotVel = 0;
+  var rot = 0;
+  var maxRot = 0.04;
+  var frameCount = 0;
+  var secondCounter = 0;
+  var lastFramerate = 0;
+  var currentFramerate = 0;
+  var BULLET_FIRE_TIMEOUT = 150;
+  var currentBulletFireTimeout = 0;
+  var freeBullets = [];
 
   var levels = [{
     f: function (t) {
       return Math.sin(t * zz) * maxRadius;
     }
   }];
+
+  var currentLevel = 0;
+  var currentf = levels[currentLevel].f;
+
 
   var SpritePrototype = {
     prevSprite: null,
@@ -474,29 +490,12 @@
     }
   }
 
-  var zz = 0;
-  var zzTarget = 2;
-  var lastFrame = timestamp();
-  var rotAcc = 0;
-  var rotVel = 0;
-  var rot = 0;
-  var maxRot = 0.04;
-  var frameCount = 0;
-  var secondCounter = 0;
-  var lastFramerate = 0;
-  var currentFramerate = 0;
+  var guy = new Guy();
+  guy.add();
 
-  var BULLET_FIRE_TIMEOUT = 150;
-  var currentBulletFireTimeout = 0;
-  var freeBullets = [];
   for (var i = 0; i < 6; i++) {
     freeBullets.push(new Bullet());
   }
-
-  var currentf = levels[currentLevel].f;
-
-  var guy = new Guy();
-  guy.add();
 
   addBada(1, 5);
 
