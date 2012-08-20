@@ -474,7 +474,6 @@
     }
   }
 
-  var offset = 0;
   var zz = 0;
   var zzTarget = 2;
   var lastFrame = timestamp();
