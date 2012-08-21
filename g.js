@@ -3,6 +3,7 @@
   var GUY    = 1;
   var BULLET = 2;
   var BADA   = 4;
+  var BOOM   = 8;
 
   requestAnimFrame = (function () {
     return  window.requestAnimationFrame ||
@@ -24,7 +25,8 @@
     timestamp = Date.now;
   }
 
-  var TAU = 2*Math.PI; // http://tauday.com/
+  var PI  = Math.PI;
+  var TAU = 2*PI; // http://tauday.com/
   var gameWidth = 600;
   var maxRadius = gameWidth / 2;
   var canvas = document.getElementById('c');
@@ -135,7 +137,7 @@
       // -D---b-
       // -b---D-
       var dist = this.angle - rot;
-      if (dist < Math.PI) {
+      if (dist < PI) {
         speed *= (dist < 0) ? 1 : -1;
       } else {
         speed *= (dist > 0) ? 1 : -1;
@@ -174,6 +176,34 @@
     collidesWith: BULLET + GUY
   };
   Sprite(Bada);
+
+  var Boom = function () {
+    this.x = 0;
+    this.y = 0;
+    this.scale = 0.1;
+    this.dir = PI/2;
+  };
+  Boom.prototype = {
+    tick: function (delta) {
+      var change = delta / 100;
+      var target = Math.atan2(guy.y - this.y, guy.x - this.x);
+      var diff = centerClamp(target - this.dir);
+      this.dir += (diff < 0) ? -change : change;
+      this.dir = clamp(this.dir);
+      this.x += Math.cos(this.dir) * delta / 10;
+      this.y += Math.sin(this.dir) * delta / 10;
+    },
+    render: function (c) {
+      c.translate(this.x, this.y);
+      c.fillStyle = 'purple';
+      c.fillRect(-4, -4, 8, 8);
+    },
+
+    type: BOOM,
+
+    collidesWith: BULLET + GUY
+  };
+  Sprite(Boom);
 
   var Guy = function () {
     this.angle = 0;
@@ -227,7 +257,7 @@
 
     type: GUY,
 
-    collidesWith: BADA
+    collidesWith: BADA + BOOM
   };
   Sprite(Guy);
 
@@ -266,7 +296,7 @@
 
     type: BULLET,
 
-    collidesWith: BADA
+    collidesWith: BADA + BOOM
   };
   Sprite(Bullet);
 
@@ -356,9 +386,9 @@
       bullet.y = guy.y;
       var angle = guy.rot + rot;
       if (direction === 'up') {
-        angle -= Math.PI/2;
+        angle -= PI/2;
       } else {
-        angle -= 3*Math.PI/2;
+        angle -= 3*PI/2;
       }
       bullet.velX = Math.cos(angle);
       bullet.velY = Math.sin(angle);
@@ -411,6 +441,17 @@
     var t = theta % TAU; 
     if (t < 0) {
       t += TAU;
+    }
+    return t;
+  }
+
+  // clamp theta to -PI..PI
+  function centerClamp(theta) {
+    var t = theta % TAU; 
+    if (t < -PI) {
+      t += TAU;
+    } else if (t > PI) {
+      t -= TAU;
     }
     return t;
   }
@@ -498,6 +539,9 @@
   }
 
   addBada(1, 5);
+
+  var boom = new Boom();
+  boom.add();
 
   var states = {
     waitToBegin: function () {
