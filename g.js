@@ -3,7 +3,7 @@
   var GUY    = 1;
   var BULLET = 2;
   var BADA   = 4;
-  var BOOM   = 8;
+  var SEEKER   = 8;
 
   requestAnimFrame = (function () {
     return  window.requestAnimationFrame ||
@@ -177,13 +177,14 @@
   };
   Sprite(Bada);
 
-  var Boom = function () {
+  var Seeker = function () {
     this.x = 0;
     this.y = 0;
     this.scale = 0.1;
     this.dir = PI/2;
+    this.rot = 0;
   };
-  Boom.prototype = {
+  Seeker.prototype = {
     tick: function (delta) {
       var change = delta / 100;
       var target = Math.atan2(guy.y - this.y, guy.x - this.x);
@@ -192,18 +193,30 @@
       this.dir = clamp(this.dir);
       this.x += Math.cos(this.dir) * delta / 10;
       this.y += Math.sin(this.dir) * delta / 10;
+      this.rot -= delta / 100;
+      this.rot = clamp(this.rot);
     },
     render: function (c) {
       c.translate(this.x, this.y);
-      c.fillStyle = 'purple';
-      c.fillRect(-4, -4, 8, 8);
+      c.rotate(this.rot);
+      c.lineWidth = 1;
+      c.beginPath();
+      c.moveTo(0,0);
+      var i = 0;
+      while (i<TAU*3) {
+        var w = Math.pow(i, 0.5) * 4;
+        c.lineTo(Math.cos(i)*w,Math.sin(i)*w);
+        i+=step;
+      }
+      c.strokeStyle='purple';
+      c.stroke();
     },
 
-    type: BOOM,
+    type: SEEKER,
 
     collidesWith: BULLET + GUY
   };
-  Sprite(Boom);
+  Sprite(Seeker);
 
   var Guy = function () {
     this.angle = 0;
@@ -257,7 +270,7 @@
 
     type: GUY,
 
-    collidesWith: BADA + BOOM
+    collidesWith: BADA + SEEKER
   };
   Sprite(Guy);
 
@@ -296,7 +309,7 @@
 
     type: BULLET,
 
-    collidesWith: BADA + BOOM
+    collidesWith: BADA + SEEKER
   };
   Sprite(Bullet);
 
@@ -540,8 +553,8 @@
 
   addBada(1, 5);
 
-  var boom = new Boom();
-  boom.add();
+  var seeker = new Seeker();
+  seeker.add();
 
   var states = {
     waitToBegin: function () {
