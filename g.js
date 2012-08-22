@@ -183,24 +183,31 @@
   var Seeker = function () {
     this.x = 0;
     this.y = 0;
-    this.scale = 0.1;
+    this.scale = 0;
     this.dir = PI/2;
     this.rot = 0;
   };
   Seeker.prototype = {
     tick: function (delta) {
-      var change = delta / 100;
-      var target = Math.atan2(guy.y - this.y, guy.x - this.x);
-      var diff = centerClamp(target - this.dir);
-      this.dir += (diff < 0) ? -change : change;
-      this.dir = clamp(this.dir);
-      this.x += Math.cos(this.dir) * delta / 10;
-      this.y += Math.sin(this.dir) * delta / 10;
+      if (this.scale < 1) {
+        this.scale += delta / 1000;
+      } else if (this.scale > 1) {
+        this.scale = 1;
+      } else {
+        var change = delta / 100;
+        var target = Math.atan2(guy.y - this.y, guy.x - this.x);
+        var diff = centerClamp(target - this.dir);
+        this.dir += (diff < 0) ? -change : change;
+        this.dir = clamp(this.dir);
+        this.x += Math.cos(this.dir) * delta / 10;
+        this.y += Math.sin(this.dir) * delta / 10;
+      }
       this.rot -= delta / 100;
       this.rot = clamp(this.rot);
     },
     render: function (c) {
       c.translate(this.x, this.y);
+      c.scale(this.scale,this.scale);
       c.rotate(this.rot);
       c.lineWidth = 1;
       c.beginPath();
@@ -588,7 +595,7 @@
       },
       bgcc: 3,
       badaSize: 1,
-      baddies: [Bada, Bada, Bada, Bada]
+      baddies: [Bada, Bada, Bada, Bada, Bada]
     },
 
     {
