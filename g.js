@@ -52,6 +52,7 @@
   var currentBulletFireTimeout = 0;
   var freeBullets = [];
   var currentLevel;
+  var badGuyCount;
 
 
   var SpritePrototype = {
@@ -169,6 +170,7 @@
       c.stroke();
     },
     derezz: function () {
+      badGuyCount--;
       newBadGuy();
     },
 
@@ -213,6 +215,7 @@
       c.stroke();
     },
     derezz: function () {
+      badGuyCount--;
       newBadGuy();
     },
 
@@ -559,6 +562,7 @@
       }
 
       currentLevel.nextBaddie++;
+      badGuyCount++;
     }
   }
 
@@ -566,6 +570,7 @@
     currentLevelNumber = (levelNumber === undefined) ? currentLevelNumber + 1 : levelNumber;
     currentLevel = levels[currentLevelNumber];
     currentLevel.nextBaddie = 0;
+    badGuyCount = 0;
     for (var i = 0; i < currentLevel.bgcc; i++) {
       newBadGuy();
     }
@@ -582,20 +587,26 @@
         return zz * maxRadius / 3;
       },
       bgcc: 3,
-      badaSize: 2,
+      badaSize: 1,
       baddies: [Bada, Bada, Bada, Bada]
     },
 
     {
       f: function (t) {
         return (zz * maxRadius / 4.2*(1 + Math.cos(t)));
-      }
+      },
+      bgcc: 3,
+      badaSize: 1,
+      baddies: [Bada, Bada, Bada, Bada, Bada, Seeker]
     },
 
     {
       f: function (t) {
         return Math.sin(t * zz) * maxRadius;
-      }
+      },
+      bgcc: 4,
+      badaSize: 1,
+      baddies: [Bada, Bada, Bada, Bada, Bada, Seeker]
     }
   ];
 
@@ -612,6 +623,7 @@
   var states = {
     waitToBegin: function () {
       if (keyDown) {
+        zz = 0;
         currentState = states.startLevel;
       }
     },
@@ -626,14 +638,26 @@
       renderLine(currentLevel.f,zz,rot);
     },
     runLevel: function (elapsed) {
+      if (badGuyCount === 0 && currentLevelNumber+1 < levels.length) {
+        currentState = states.finishLevel;
+      }
       handleControls(elapsed);
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
       runSprites(elapsed);
     },
-    guyDie: function () {
+    finishLevel: function (elapsed) {
+      if (zz < zzTarget*2) {
+        zz += elapsed / 800;
+      } else {
+        zz = 0;
+        currentState = states.startLevel;
+        startNewLevel();
+      }
+      integrateLine();
+      renderLine(currentLevel.f,zz,rot);
     },
-    finishLevel: function () {
+    guyDie: function () {
     },
     outOfLives: function () {
     }
