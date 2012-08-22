@@ -121,17 +121,17 @@
   //// SPRITES ////
   /////////////////
 
-  var Bada = function () {
+  var Bada = function (group) {
+    this.group = group;
     this.ani = 0;
     this.dist = 0;
     this.scale = 0.1;
-    this.dir = (Math.random() > 0.5) ? 1 : -1;
   };
   Bada.prototype = {
     tick: function (delta) {
       this.ani += delta / 100;
       this.ani %= 5;
-      var speed = this.dir * delta / 10000;
+      var speed = this.group.dir * delta / 10000;
 
       if (this.scale < 1) {
         this.scale += delta / 1000;
@@ -161,8 +161,10 @@
       c.stroke();
     },
     derezz: function () {
-      badGuyCount--;
-      newBadGuy();
+      if (--this.group.count === 0) {
+        badGuyCount--;
+        newBadGuy();
+      }
     },
 
     type: BADA,
@@ -485,8 +487,12 @@
   }
 
   function addBada(position, length) {
+    var group = {
+      dir: (Math.random() > 0.5) ? 1 : -1,
+      count: length
+    };
     for (var i = 0; i < length; i++) {
-      var bada = new Bada();
+      var bada = new Bada(group);
       bada.angle = position + i/20;
       bada.ani = i;
       bada.add();
@@ -585,7 +591,7 @@
         return zz * maxRadius / 3;
       },
       bgcc: 3,
-      badaSize: 1,
+      badaSize: 2,
       baddies: [Bada, Bada, Bada, Bada, Bada]
     },
 
@@ -594,7 +600,7 @@
         return (zz * maxRadius / 4.2*(1 + Math.cos(t)));
       },
       bgcc: 3,
-      badaSize: 1,
+      badaSize: 3,
       baddies: [Bada, Bada, Bada, Bada, Bada, Seeker]
     },
 
@@ -603,7 +609,7 @@
         return Math.sin(t * zz) * maxRadius;
       },
       bgcc: 4,
-      badaSize: 1,
+      badaSize: 4,
       baddies: [Bada, Bada, Bada, Bada, Bada, Seeker]
     }
   ];
