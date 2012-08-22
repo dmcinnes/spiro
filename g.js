@@ -125,22 +125,13 @@
     this.ani = 0;
     this.dist = 0;
     this.scale = 0.1;
+    this.dir = (Math.random() > 0.5) ? 1 : -1;
   };
   Bada.prototype = {
     tick: function (delta) {
       this.ani += delta / 100;
       this.ani %= 5;
-      var speed = delta / 10000;
-      // --D-b--
-      // --b-D--
-      // -D---b-
-      // -b---D-
-      var dist = this.angle - rot;
-      if (dist < PI) {
-        speed *= (dist < 0) ? 1 : -1;
-      } else {
-        speed *= (dist > 0) ? 1 : -1;
-      }
+      var speed = this.dir * delta / 10000;
 
       if (this.scale < 1) {
         this.scale += delta / 1000;
