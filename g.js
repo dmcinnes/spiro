@@ -51,15 +51,7 @@
   var BULLET_FIRE_TIMEOUT = 150;
   var currentBulletFireTimeout = 0;
   var freeBullets = [];
-
-  var levels = [{
-    f: function (t) {
-      return Math.sin(t * zz) * maxRadius;
-    }
-  }];
-
-  var currentLevel = 0;
-  var currentf = levels[currentLevel].f;
+  var currentLevel;
 
 
   var SpritePrototype = {
@@ -72,7 +64,7 @@
              this.y < -maxRadius;
     },
     updateSpriteCartesian: function () {
-      if (this.angle) {
+      if (this.angle !== undefined) {
         this.x = Math.cos(rot + this.angle) * this.dist;
         this.y = Math.sin(rot + this.angle) * this.dist;
       }
@@ -100,11 +92,17 @@
       // clear for further use
       this.prevSprite = null;
       this.nextSprite = null;
+      
+      this.derezz();
     },
     distance: function (other) {
       return Math.sqrt(Math.pow(this.x - other.x,2) + Math.pow(this.y - other.y,2));
     },
     collide: function (other) {
+      // called when a collision occurs
+    },
+    derezz: function (other) {
+      // called when this sprite goes to meet its user
     }
   };
 
@@ -151,7 +149,7 @@
 
       this.angle = clamp(this.angle + speed);
 
-      this.dist = currentf(this.angle);
+      this.dist = currentLevel.f(this.angle);
       this.rot = tangentAngle(this.angle);
 
       this.updateSpriteCartesian();
@@ -169,6 +167,9 @@
       c.lineTo(0, 8 + this.ani);
       c.closePath();
       c.stroke();
+    },
+    derezz: function () {
+      newBadGuy();
     },
 
     type: BADA,
@@ -211,6 +212,9 @@
       c.strokeStyle='purple';
       c.stroke();
     },
+    derezz: function () {
+      newBadGuy();
+    },
 
     type: SEEKER,
 
@@ -220,6 +224,7 @@
 
   var Guy = function () {
     this.angle = 0;
+    this.rot = 0;
     this.x = 0;
     this.y = 0;
   };
@@ -245,7 +250,7 @@
            -15,   0],
 
     tick: function (delta) {
-      this.dist = currentf(this.angle);
+      this.dist = currentLevel.f(this.angle);
       this.pathLength = this.path.length/2;
       this.rot = tangentAngle(this.angle);
       this.updateSpriteCartesian();
@@ -292,10 +297,7 @@
       c.fillStyle='black';
       c.fillRect(-4,-4,8,8);
     },
-    remove: function () {
-      // override the remove function
-      // call original
-      SpritePrototype.remove.apply(this);
+    derezz: function () {
       freeBullets.push(this);
     },
     collide: function (other) {
@@ -470,10 +472,10 @@
   }
 
   function tangentAngle(theta) {
-    var t1 = currentf(theta);
+    var t1 = currentLevel.f(theta);
     var x1 = Math.cos(theta)*t1;
     var y1 = Math.sin(theta)*t1;
-    var t2 = currentf(theta+step);
+    var t2 = currentLevel.f(theta+step);
     var x2 = Math.cos(theta+step)*t2;
     var y2 = Math.sin(theta+step)*t2;
     x = x2 - x1;
@@ -544,6 +546,59 @@
     }
   }
 
+  function newBadGuy() {
+    if (currentLevel.nextBaddie < currentLevel.baddies.length) {
+      var baddieClass = currentLevel.baddies[currentLevel.nextBaddie];
+      var rotation = Math.random() * TAU;
+      if (baddieClass === Bada) {
+        addBada(rotation, currentLevel.badaSize);
+      } else {
+        var baddie = new baddieClass();
+        baddie.add();
+        baddie.rotation = rotation;
+      }
+
+      currentLevel.nextBaddie++;
+    }
+  }
+
+  function startNewLevel(levelNumber) {
+    currentLevelNumber = (levelNumber === undefined) ? currentLevelNumber + 1 : levelNumber;
+    currentLevel = levels[currentLevelNumber];
+    currentLevel.nextBaddie = 0;
+    for (var i = 0; i < currentLevel.bgcc; i++) {
+      newBadGuy();
+    }
+  }
+
+
+  //////////////
+  /// Levels ///
+  //////////////
+
+  var levels = [
+    {
+      f: function (t) {
+        return zz * maxRadius / 3;
+      },
+      bgcc: 3,
+      badaSize: 2,
+      baddies: [Bada, Bada, Bada, Bada]
+    },
+
+    {
+      f: function (t) {
+        return (zz * maxRadius / 4.2*(1 + Math.cos(t)));
+      }
+    },
+
+    {
+      f: function (t) {
+        return Math.sin(t * zz) * maxRadius;
+      }
+    }
+  ];
+
   var guy = new Guy();
   guy.add();
 
@@ -551,10 +606,8 @@
     freeBullets.push(new Bullet());
   }
 
-  addBada(1, 5);
+  startNewLevel(0);
 
-  var seeker = new Seeker();
-  seeker.add();
 
   var states = {
     waitToBegin: function () {
@@ -570,12 +623,12 @@
         currentState = states.runLevel;
       }
       integrateLine();
-      renderLine(currentf,zz,rot);
+      renderLine(currentLevel.f,zz,rot);
     },
     runLevel: function (elapsed) {
       handleControls(elapsed);
       integrateLine();
-      renderLine(currentf,zz,rot);
+      renderLine(currentLevel.f,zz,rot);
       runSprites(elapsed);
     },
     guyDie: function () {
