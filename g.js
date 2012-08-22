@@ -31,8 +31,6 @@
   var maxRadius = gameWidth / 2;
   var canvas = document.getElementById('c');
   var c = canvas.getContext('2d');
-  c.translate(305,305);
-  c.lineWidth = 2;
   var step = TAU/360;
   var running = true;
   var tailSprite = null;
@@ -53,7 +51,10 @@
   var freeBullets = [];
   var currentLevel;
   var badGuyCount;
+  var guy;
 
+  c.translate(305,305);
+  c.lineWidth = 2;
 
   var SpritePrototype = {
     prevSprite: null,
@@ -571,10 +572,24 @@
   }
 
   function startNewLevel(levelNumber) {
+    // remove existing sprites
+    var sprite = tailSprite;
+    while (sprite) {
+      sprite.remove();
+      sprite = tailSprite;
+    }
+
+    // create new guy
+    guy = new Guy();
+    guy.add();
+
+    // queue up next level
     currentLevelNumber = (levelNumber === undefined) ? currentLevelNumber + 1 : levelNumber;
     currentLevel = levels[currentLevelNumber];
     currentLevel.nextBaddie = 0;
     badGuyCount = 0;
+
+    // add first bad guys
     for (var i = 0; i < currentLevel.bgcc; i++) {
       newBadGuy();
     }
@@ -613,9 +628,6 @@
       baddies: [Bada, Bada, Bada, Bada, Bada, Seeker]
     }
   ];
-
-  var guy = new Guy();
-  guy.add();
 
   for (var i = 0; i < 6; i++) {
     freeBullets.push(new Bullet());
