@@ -500,6 +500,29 @@
     }
   }
 
+  function findAFreeSpot() {
+    var sprite = headSprite;
+    var buckets = [];
+    var bucket = 0;
+    while (sprite) {
+      bucket = Math.floor(100 * sprite.angle / TAU);
+      buckets[bucket] = true;
+      sprite = sprite.nextSprite;
+    }
+    // start random
+    bucket = Math.floor(Math.random() * 100);
+    // traverse over the buckets
+    var tries = 0;
+    while (buckets[bucket] && tries < 100) {
+      bucket = (bucket + 7) % 100;
+      tries++;
+    }
+    if (tries > 100) {
+      // no free spot
+      return false;
+    }
+    return bucket;
+  }
 
   function renderFramerate(delta) {
     frameCount++;
@@ -557,7 +580,10 @@
   function newBadGuy() {
     if (currentLevel.nextBaddie < currentLevel.baddies.length) {
       var baddieClass = currentLevel.baddies[currentLevel.nextBaddie];
-      var rotation = Math.random() * TAU;
+      var rotation = findAFreeSpot();
+      if (rotation === false) {
+        return;
+      }
       if (baddieClass === Bada) {
         addBada(rotation, currentLevel.badaSize);
       } else {
