@@ -546,6 +546,47 @@
     return bucket;
   }
 
+  function renderTitle(delta) {
+    c.save();
+    c.translate(-140, -100);
+    c.scale(2,2);
+    // S
+    c.beginPath();
+    c.moveTo(24, 0);
+    c.bezierCurveTo(-40, 0, 70, 100, 0, 100);
+    c.stroke();
+    // P
+    c.translate(34, 0);
+    c.beginPath();
+    c.moveTo(0, 100);
+    c.lineTo(0, 0);
+    c.bezierCurveTo(30, 0, 30, 50, 0, 50);
+    c.stroke();
+    // I
+    c.translate(32, 0);
+    c.beginPath();
+    c.moveTo(0, 0);
+    c.lineTo(0, 100);
+    c.stroke();
+    // R
+    c.translate(12, 0);
+    c.beginPath();
+    c.moveTo(0, 100);
+    c.lineTo(0, 0);
+    c.bezierCurveTo(30, 0, 30, 50, 0, 50);
+    c.lineTo(20, 100);
+    c.stroke();
+    // O
+    c.translate(30, 0);
+    c.beginPath();
+    c.moveTo(10, 0);
+    c.bezierCurveTo(-4, 0, -4, 100, 10, 100);
+    c.bezierCurveTo(24, 100, 24, 0, 10, 0);
+    c.stroke();
+ 
+    c.restore();
+  }
+
   function renderFramerate(delta) {
     frameCount++;
     secondCounter += delta;
@@ -712,7 +753,8 @@
 
 
   var states = {
-    waitToBegin: function () {
+    waitToBegin: function (elapsed) {
+      renderTitle(elapsed);
       if (keyDown) {
         zz = 0;
         currentState = states.startLevel;
