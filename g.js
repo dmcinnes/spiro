@@ -548,6 +548,7 @@
 
   function renderTitle(delta) {
     c.save();
+    c.lineJoin = "round";
     c.translate(-140, -100);
     c.scale(2,2);
     // S
