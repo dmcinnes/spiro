@@ -641,7 +641,7 @@
   var levels = [
     {
       f: function (t) {
-        return zz * maxRadius / 3;
+        return maxRadius * Math.cos(Math.sin(t * zz)) - 20;
       },
       bgcc: 3,
       badaSize: 2,
@@ -664,7 +664,25 @@
       bgcc: 4,
       badaSize: 4,
       baddies: [Bada, Bada, Bada, Bada, Bada, Seeker]
-    }
+    },
+
+    {
+      f: function (t) {
+        return maxRadius * Math.cos(Math.sin(2 * t * zz)) - 20;
+      },
+      bgcc: 4,
+      badaSize: 4,
+      baddies: [Bada, Bada, Bada, Bada, Bada, Seeker, Bada, Seeker]
+    },
+
+    {
+      f: function (t) {
+        return maxRadius * Math.cos(2*Math.sin(t * zz));
+      },
+      bgcc: 4,
+      badaSize: 3,
+      baddies: [Bada, Bada, Bada, Bada, Bada, Seeker]
+    },
   ];
 
   for (var i = 0; i < 6; i++) {
