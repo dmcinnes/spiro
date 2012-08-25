@@ -79,6 +79,8 @@
         headSprite = this;
       }
       tailSprite = this;
+
+      this.alive = true;
     },
     remove: function () {
       if (this.prevSprite) {
@@ -94,6 +96,8 @@
       // clear for further use
       this.prevSprite = null;
       this.nextSprite = null;
+
+      this.alive = false;
       
       this.derezz();
     },
@@ -275,6 +279,14 @@
       c.stroke();
       c.fillStyle='red';
       c.fillRect(-10, -7, 20, 14);
+    },
+
+    collide: function (other) {
+      var p = new Particles(10);
+      p.x = this.x;
+      p.y = this.y;
+      p.add();
+      this.remove();
     },
 
     type: GUY,
@@ -683,6 +695,9 @@
       if (badGuyCount === 0 && currentLevelNumber+1 < levels.length) {
         currentState = states.finishLevel;
       }
+      if (!guy.alive) {
+        currentState = states.guyDie;
+      }
       handleControls(elapsed);
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
@@ -699,9 +714,15 @@
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
     },
-    guyDie: function () {
+    guyDie: function (elapsed) {
+      currentState = states.waitToRestart;
     },
-    outOfLives: function () {
+    waitToRestart: function (elapsed) {
+      integrateLine();
+      renderLine(currentLevel.f,zz,rot);
+      runSprites(elapsed);
+    },
+    gameOver: function () {
     }
   };
   var currentState = states.waitToBegin;
