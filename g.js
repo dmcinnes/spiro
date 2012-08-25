@@ -693,6 +693,15 @@
       badaSize: 3,
       baddies: [Bada, Bada, Bada, Bada, Bada, Seeker]
     },
+
+    {
+      f: function (t) {
+        return maxRadius * Math.sin(t + t * zz);
+      },
+      bgcc: 3,
+      badaSize: 2,
+      baddies: [Bada, Bada, Bada, Bada, Bada]
+    }
   ];
 
   for (var i = 0; i < 6; i++) {
