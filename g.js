@@ -165,6 +165,13 @@
       c.closePath();
       c.stroke();
     },
+    collide: function (other) {
+      this.remove();
+      var p = new Particles(5);
+      p.x = this.x;
+      p.y = this.y;
+      p.add();
+    },
     derezz: function () {
       if (--this.group.count === 0) {
         badGuyCount--;
@@ -218,6 +225,13 @@
       }
       c.strokeStyle='purple';
       c.stroke();
+    },
+    collide: function (other) {
+      this.remove();
+      var p = new Particles(5);
+      p.x = this.x;
+      p.y = this.y;
+      p.add();
     },
     derezz: function () {
       badGuyCount--;
@@ -317,12 +331,7 @@
       freeBullets.push(this);
     },
     collide: function (other) {
-      other.remove();
       this.remove();
-      var p = new Particles(5);
-      p.x = this.x;
-      p.y = this.y;
-      p.add();
     },
 
     type: BULLET,
@@ -404,6 +413,7 @@
         // dumb distance comparison
         if (sprite.distance(canidate) < 10) {
           sprite.collide(canidate);
+          canidate.collide(sprite);
         }
       }
       sprite = sprite.nextSprite;
