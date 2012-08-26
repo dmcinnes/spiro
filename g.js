@@ -288,11 +288,16 @@
         c.lineTo(this.path[2*i], this.path[2*i+1]);
       }
       c.closePath();
-      c.fillStyle='black';
+      c.fillStyle='#A66E00';
       c.fill();
+      c.strokeStyle='#FFA900';
       c.stroke();
-      c.fillStyle='red';
+      c.fillStyle='#FFCF73';
       c.fillRect(-10, -7, 20, 14);
+      c.fillStyle='#FFBE40';
+      c.fillRect(-10, -5, 20, 10);
+      c.fillStyle='#FFCF73';
+      c.fillRect(-10, -3, 20, 6);
     },
 
     collide: function (other) {
@@ -474,7 +479,7 @@
     }
     c.strokeStyle='#FFBE40';
     c.shadowColor='#FFCF73';
-    c.shadowBlur='50';
+    c.shadowBlur='30';
     c.stroke();
     c.restore();
   }
