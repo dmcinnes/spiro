@@ -156,7 +156,7 @@
       c.rotate(rot + this.rot);
       c.scale(this.scale, this.scale);
       c.beginPath();
-      c.strokeStyle='blue';
+      c.strokeStyle='#06276F';
       c.lineWidth = 3/this.scale;
       c.moveTo(-10 + this.ani, 0);
       c.lineTo(0, -8 - this.ani);
@@ -461,7 +461,7 @@
     // scale it up
     var percent = zz/zzTarget;
     c.scale(percent, percent);
-    c.lineWidth = 2/percent;
+    c.lineWidth = 3/percent;
 
     c.rotate(rot);
     var i=0;
@@ -472,7 +472,9 @@
       c.lineTo(Math.cos(i)*w,Math.sin(i)*w);
       i+=step;
     }
-    c.strokeStyle='black';
+    c.strokeStyle='#FFBE40';
+    c.shadowColor='#FFCF73';
+    c.shadowBlur='50';
     c.stroke();
     c.restore();
   }
@@ -548,6 +550,10 @@
 
   function renderTitle(delta) {
     c.save();
+    c.strokeStyle='#FFA900';
+    c.shadowOffsetX=4;
+    c.shadowOffsetY=2;
+    c.shadowColor='#BF8F30';
     c.lineJoin = "round";
     c.translate(-140, -100);
     c.scale(2,2);
