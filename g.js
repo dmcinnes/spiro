@@ -366,6 +366,7 @@
     render: function (c) {
       var count = this.particleDirections.length;
       c.translate(this.x, this.y);
+      c.fillStyle = "#FFCF73";
       for (var i = 0; i < count; i+=2) {
         var particleX = this.particleDirections[i];
         var particleY = this.particleDirections[i+1];
