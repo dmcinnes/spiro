@@ -330,8 +330,6 @@
       c.translate(this.x, this.y);
       c.rotate(this.rot);
       c.fillStyle='#FFBE40';
-      c.shadowColor='#FFCF73';
-      c.shadowBlur = 10;
       c.fillRect(-2,-2,4,4);
     },
     derezz: function () {
