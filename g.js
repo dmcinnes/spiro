@@ -157,6 +157,8 @@
       c.scale(this.scale, this.scale);
       c.beginPath();
       c.strokeStyle='#06276F';
+      c.shadowBlur = 4;
+      c.shadowColor='#2A4580';
       c.lineWidth = 3/this.scale;
       c.moveTo(-10 + this.ani, 0);
       c.lineTo(0, -8 - this.ani);
@@ -214,7 +216,7 @@
       c.translate(this.x, this.y);
       c.scale(this.scale,this.scale);
       c.rotate(this.rot);
-      c.lineWidth = 1;
+      c.lineWidth = 2;
       c.beginPath();
       c.moveTo(0,0);
       var i = 0;
@@ -223,7 +225,9 @@
         c.lineTo(Math.cos(i)*w,Math.sin(i)*w);
         i+=step;
       }
-      c.strokeStyle='purple';
+      c.strokeStyle='#06276F';
+      c.shadowBlur = 5;
+      c.shadowColor='#2A4580';
       c.stroke();
     },
     collide: function (other) {
@@ -305,7 +309,7 @@
       p.x = this.x;
       p.y = this.y;
       p.add();
-      this.remove();
+      // this.remove();
     },
 
     type: GUY,
@@ -709,7 +713,7 @@
       },
       bgcc: 3,
       badaSize: 2,
-      baddies: [Bada, Bada, Bada, Bada, Bada]
+      baddies: [Seeker, Bada, Bada, Bada, Bada]
     },
 
     {
