@@ -3,7 +3,8 @@
   var GUY    = 1;
   var BULLET = 2;
   var BADA   = 4;
-  var SEEKER   = 8;
+  var SEEKER = 8;
+  var PULSE  = 16;
 
   requestAnimFrame = (function () {
     return  window.requestAnimationFrame ||
@@ -50,6 +51,7 @@
   var currentBulletFireTimeout = 0;
   var freeBullets = [];
   var currentLevel;
+  var pulseCount = 1;
   var badGuyCount;
   var guy;
 
@@ -183,7 +185,7 @@
 
     type: BADA,
 
-    collidesWith: BULLET + GUY
+    collidesWith: BULLET + GUY + PULSE
   };
   Sprite(Bada);
 
@@ -244,7 +246,7 @@
 
     type: SEEKER,
 
-    collidesWith: BULLET + GUY
+    collidesWith: BULLET + GUY + PULSE
   };
   Sprite(Seeker);
 
@@ -348,6 +350,46 @@
     collidesWith: BADA + SEEKER
   };
   Sprite(Bullet);
+
+  var Pulse = function (start, dir) {
+    this.angle = start;
+    this.dir   = dir;
+    this.life  = Pulse.MAX_LIFE;
+  };
+  Pulse.MAX_LIFE = 1000;
+  Pulse.prototype = {
+    tick: function (delta) {
+      this.life -= delta;
+      if (this.life <= 0) {
+        this.remove();
+      }
+      var percent = this.life / Pulse.MAX_LIFE;
+      this.angle = clamp(this.angle + this.dir * (percent / 30 + delta / 500));
+      this.dist = currentLevel.f(this.angle);
+      this.updateSpriteCartesian();
+    },
+    render: function (c) {
+      c.translate(this.x, this.y);
+      c.beginPath();
+      c.fillStyle='#FFBE40';
+      c.shadowColor='#FFCF73';
+      c.shadowBlur='30';
+      c.arc(0,0,5,0,TAU);
+      c.closePath();
+      c.fill();
+    },
+    derezz: function () {
+      var p = new Particles(3);
+      p.x = this.x;
+      p.y = this.y;
+      p.add();
+    },
+
+    type: PULSE,
+
+    collidesWidth: BADA + SEEKER
+  };
+  Sprite(Pulse);
 
   var Particles = function (count) {
     this.life = 0;
@@ -629,7 +671,11 @@
       rotAcc = elapsed / 10000;
     }
     if (KEYS.space) {
-      rotAcc = -rotVel / 10;
+      // rotAcc = -rotVel / 10;
+      if (pulseCount-- > 0) {
+        (new Pulse(guy.angle, 1)).add();
+        (new Pulse(guy.angle, -1)).add();
+      }
     }
     if (KEYS.x) {
       currentBulletFireTimeout -= elapsed;
@@ -782,6 +828,7 @@
         zz += elapsed / 800;
       } else {
         zz = zzTarget;
+        pulseCount = 1;
         currentState = states.runLevel;
       }
       integrateLine();
