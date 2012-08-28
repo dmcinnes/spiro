@@ -374,7 +374,7 @@
       c.fillStyle='#FFBE40';
       c.shadowColor='#FFCF73';
       c.shadowBlur='30';
-      c.arc(0,0,5,0,TAU);
+      c.arc(0,0,10,0,TAU);
       c.closePath();
       c.fill();
     },
