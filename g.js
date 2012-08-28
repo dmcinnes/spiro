@@ -218,19 +218,7 @@
       c.translate(this.x, this.y);
       c.scale(this.scale,this.scale);
       c.rotate(this.rot);
-      c.lineWidth = 2;
-      c.beginPath();
-      c.moveTo(0,0);
-      var i = 0;
-      while (i<TAU*3) {
-        var w = Math.pow(i, 0.5) * 4;
-        c.lineTo(Math.cos(i)*w,Math.sin(i)*w);
-        i+=step;
-      }
-      c.strokeStyle='#06276F';
-      c.shadowBlur = 5;
-      c.shadowColor='#2A4580';
-      c.stroke();
+      c.drawImage(Seeker.canvas, -25, -25);
     },
     collide: function (other) {
       this.remove();
@@ -250,6 +238,29 @@
   };
   Sprite(Seeker);
 
+  // create seeker sprite
+  (function () {
+    Seeker.canvas = document.createElement('canvas');
+    Seeker.canvas.width=50;
+    Seeker.canvas.height=50;
+    var con = Seeker.canvas.getContext('2d');
+    con.translate(25,25);
+    con.lineWidth = 2;
+    con.beginPath();
+    con.moveTo(0,0);
+    var i = 0;
+    while (i<TAU*3) {
+      var w = Math.pow(i, 0.5) * 4;
+      con.lineTo(Math.cos(i)*w,Math.sin(i)*w);
+      i+=step;
+    }
+    con.strokeStyle='#06276F';
+    con.shadowBlur = 5;
+    con.shadowColor='#2A4580';
+    con.stroke();
+  })();
+
+
   var Guy = function () {
     this.angle = 0;
     this.rot = 0;
@@ -257,29 +268,8 @@
     this.y = 0;
   };
   Guy.prototype = {
-    path: [-15,   0,
-           -10,  -8,
-            -5,  -8,
-            -2, -10,
-            -2,  -8,
-             2,  -8,
-             2, -10,
-             5,  -8,
-            10,  -8,
-            15,   0,
-            10,   8,
-             5,   8,
-             2,  10,
-             2,   8,
-            -2,   8,
-            -2,  10,
-            -5,   8,
-           -10,   8,
-           -15,   0],
-
     tick: function (delta) {
       this.dist = currentLevel.f(this.angle);
-      this.pathLength = this.path.length/2;
       this.rot = tangentAngle(this.angle);
       this.updateSpriteCartesian();
       this.angle = rot;
@@ -288,22 +278,7 @@
     render: function (c) {
       c.translate(this.x, this.y);
       c.rotate(rot + this.rot);
-      c.beginPath();
-      c.moveTo(this.path[0], this.path[1]);
-      for (var i = 1; i < this.pathLength; i++) {
-        c.lineTo(this.path[2*i], this.path[2*i+1]);
-      }
-      c.closePath();
-      c.fillStyle='#A66E00';
-      c.fill();
-      c.strokeStyle='#FFA900';
-      c.stroke();
-      c.fillStyle='#FFCF73';
-      c.fillRect(-10, -7, 20, 14);
-      c.fillStyle='#FFBE40';
-      c.fillRect(-10, -5, 20, 10);
-      c.fillStyle='#FFCF73';
-      c.fillRect(-10, -3, 20, 6);
+      c.drawImage(Guy.canvas, -15, -10);
     },
 
     collide: function (other) {
@@ -319,6 +294,32 @@
     collidesWith: BADA + SEEKER
   };
   Sprite(Guy);
+
+  // create guy sprite
+  (function () {
+    var path = [-15, 0, -10, -8, -5, -8, -2, -10, -2, -8, 2, -8, 2, -10, 5, -8, 10, -8, 15, 0, 10, 8, 5, 8, 2, 10, 2, 8, -2, 8, -2, 10, -5, 8, -10, 8, -15, 0];
+    Guy.canvas = document.createElement('canvas');
+    Guy.canvas.width=30;
+    Guy.canvas.height=20;
+    var con = Guy.canvas.getContext('2d');
+    con.translate(15,10);
+    con.beginPath();
+    con.moveTo(path[0], path[1]);
+    for (var i = 1; i < path.length; i++) {
+      con.lineTo(path[2*i], path[2*i+1]);
+    }
+    con.closePath();
+    con.fillStyle='#A66E00';
+    con.fill();
+    con.strokeStyle='#FFA900';
+    con.stroke();
+    con.fillStyle='#FFCF73';
+    con.fillRect(-10, -7, 20, 14);
+    con.fillStyle='#FFBE40';
+    con.fillRect(-10, -5, 20, 10);
+    con.fillStyle='#FFCF73';
+    con.fillRect(-10, -3, 20, 6);
+  })();
 
   var Bullet = function () {
     this.rot = 0;
