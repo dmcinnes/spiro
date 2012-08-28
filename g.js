@@ -507,6 +507,27 @@
     rotAcc = 0;
   }
 
+  function lineLength(f) {
+    var z = zzTarget;
+    var length = 0;
+    var i=0;
+    c.beginPath();
+    c.moveTo(f(0,z),0);
+    var x1 = f(0,z);
+    var y1 = 0;
+    var x2, y2;
+    while (i<TAU) {
+      var w = f(i,z);
+      x2 = Math.cos(i)*w;
+      y2 = Math.sin(i)*w;
+      length += Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
+      x1 = x2;
+      y1 = y2;
+      i+=step;
+    }
+    return length;
+  }
+
   function renderLine(f,z,rot) {
     c.save();
 
@@ -828,6 +849,7 @@
         zz += elapsed / 800;
       } else {
         zz = zzTarget;
+        currentLevel.length = lineLength(currentLevel.f);
         pulseCount = 1;
         currentState = states.runLevel;
       }
