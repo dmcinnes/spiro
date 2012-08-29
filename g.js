@@ -597,12 +597,14 @@
     var f = level.f;
     var z = zzTarget;
     var i=0;
-    var angle=0;
-    var x1 = f(0,z);
-    var y1 = 0;
+    var angle=TAU-step;
+    var w = f(angle,z);
+    var x1 = Math.cos(angle)*w;
+    var y1 = Math.sin(angle)*w;
+    angle = 0;
     var x2, y2, x, y;
     while (angle<TAU) {
-      var w = f(angle,z);
+      w = f(angle,z);
       x2 = Math.cos(angle)*w;
       y2 = Math.sin(angle)*w;
       x = x2 - x1;
@@ -666,7 +668,7 @@
   // get precalculated tangent
   function tangentAngle(theta) {
     var i = Math.floor(segmentCount * theta / TAU);
-    return currentLevel.segments[i].tangent;
+    return (currentLevel.segments) ? currentLevel.segments[i].tangent : 0;
   }
 
   function addBada(position, length) {
