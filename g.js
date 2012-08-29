@@ -36,7 +36,8 @@
   var maxRadius = gameWidth / 2;
   var canvas = document.getElementById('c');
   var c = canvas.getContext('2d');
-  var step = TAU/360;
+  var segmentCount = 360;
+  var step = TAU/segmentCount;
   var running = true;
   var tailSprite = null;
   var headSprite = null;
@@ -309,16 +310,18 @@
       c.fill();
     },
     renderLeg: function (c, side, face, aniOffset) {
+      c.save();
       var ani = 10 * Math.sin(this.ani + aniOffset);
-      var dist = face * (30 + ani);
-      var halfDist = dist/2;
+      var reach = face * (30 + ani);
+      var halfReach = reach/2;
       // outer leg is 30
-      var knuckle = Math.sqrt(30 * 30 - halfDist * halfDist);
+      var knuckle = Math.sqrt(30 * 30 - halfReach * halfReach);
       c.beginPath();
       c.moveTo(0, 0);
-      c.lineTo(halfDist, knuckle * side);
-      c.lineTo(dist, 0);
+      c.lineTo(halfReach, knuckle * side);
+      c.lineTo(reach, 0);
       c.stroke();
+      c.restore();
     },
     collide: function (other) {
       this.remove();
@@ -586,25 +589,34 @@
     rotAcc = 0;
   }
 
-  function lineLength(f) {
+  function precalculateLineSegments(level) {
+    if (level.segments) {
+      return; // already calculated
+    }
+    var segments = [];
+    var f = level.f;
     var z = zzTarget;
-    var length = 0;
     var i=0;
-    c.beginPath();
-    c.moveTo(f(0,z),0);
+    var angle=0;
     var x1 = f(0,z);
     var y1 = 0;
-    var x2, y2;
-    while (i<TAU) {
-      var w = f(i,z);
-      x2 = Math.cos(i)*w;
-      y2 = Math.sin(i)*w;
-      length += Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
+    var x2, y2, x, y;
+    while (angle<TAU) {
+      var w = f(angle,z);
+      x2 = Math.cos(angle)*w;
+      y2 = Math.sin(angle)*w;
+      x = x2 - x1;
+      y = y2 - y1;
+      segments[i] = {
+        length: Math.sqrt(Math.pow(x,2) + Math.pow(y,2)),
+        tangent: Math.atan2(y, x)
+      };
       x1 = x2;
       y1 = y2;
-      i+=step;
+      i++;
+      angle+=step;
     }
-    return length;
+    level.segments = segments;
   }
 
   function renderLine(f,z,rot) {
@@ -651,16 +663,10 @@
     return t;
   }
 
+  // get precalculated tangent
   function tangentAngle(theta) {
-    var t1 = currentLevel.f(theta);
-    var x1 = Math.cos(theta)*t1;
-    var y1 = Math.sin(theta)*t1;
-    var t2 = currentLevel.f(theta+step);
-    var x2 = Math.cos(theta+step)*t2;
-    var y2 = Math.sin(theta+step)*t2;
-    x = x2 - x1;
-    y = y2 - y1;
-    return Math.atan2(y, x); // radians
+    var i = Math.floor(segmentCount * theta / TAU);
+    return currentLevel.segments[i].tangent;
   }
 
   function addBada(position, length) {
@@ -928,7 +934,7 @@
         zz += elapsed / 800;
       } else {
         zz = zzTarget;
-        currentLevel.length = lineLength(currentLevel.f);
+        precalculateLineSegments(currentLevel);
         pulseCount = 1;
         currentState = states.runLevel;
       }
