@@ -2,9 +2,13 @@
 
   var GUY    = 1;
   var BULLET = 2;
-  var BADA   = 4;
-  var SEEKER = 8;
-  var PULSE  = 16;
+  var PULSE  = 4;
+  var BADA   = 8;
+  var SEEKER = 16;
+  var SPIDER = 32;
+
+  var GOOD_GUYS = GUY + BULLET + PULSE;
+  var BAD_GUYS  = BADA + SEEKER + SPIDER;
 
   requestAnimFrame = (function () {
     return  window.requestAnimationFrame ||
@@ -185,7 +189,7 @@
 
     type: BADA,
 
-    collidesWith: BULLET + GUY + PULSE
+    collidesWith: GOOD_GUYS
   };
   Sprite(Bada);
 
@@ -234,7 +238,7 @@
 
     type: SEEKER,
 
-    collidesWith: BULLET + GUY + PULSE
+    collidesWith: GOOD_GUYS
   };
   Sprite(Seeker);
 
@@ -259,6 +263,80 @@
     con.shadowColor='#2A4580';
     con.stroke();
   })();
+
+
+  var Spider = function () {
+    this.ani = 0;
+    this.dist = 0;
+    this.scale = 0;
+    this.dir = 1;
+  };
+  Spider.prototype = {
+    tick: function (delta) {
+      this.ani += delta / 200;
+      this.ani %= TAU;
+
+      var speed = this.dir * delta / 5000;
+
+      if (this.scale < 1) {
+        this.scale += delta / 1000;
+      } else if (this.scale > 1) {
+        this.scale = 1;
+      }
+
+      this.angle = clamp(this.angle + speed);
+
+      this.dist = currentLevel.f(this.angle);
+      this.rot = tangentAngle(this.angle);
+
+      this.updateSpriteCartesian();
+    },
+    render: function (c) {
+      c.strokeStyle='#06276F';
+      c.fillStyle='#06276F';
+      c.shadowColor='#2A4580';
+      c.shadowBlur = 4;
+      c.translate(this.x, this.y);
+      c.rotate(rot + this.rot);
+      c.scale(this.scale, this.scale);
+      this.renderLeg(c,1,1,0);
+      this.renderLeg(c,-1,1,PI);
+      this.renderLeg(c,1,-1,3*PI/2);
+      this.renderLeg(c,-1,-1,PI/2);
+      c.beginPath();
+      c.arc(0,0,10,0,TAU);
+      c.closePath();
+      c.fill();
+    },
+    renderLeg: function (c, side, face, aniOffset) {
+      var ani = 10 * Math.sin(this.ani + aniOffset);
+      var dist = face * (30 + ani);
+      var halfDist = dist/2;
+      // outer leg is 30
+      var knuckle = Math.sqrt(30 * 30 - halfDist * halfDist);
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.lineTo(halfDist, knuckle * side);
+      c.lineTo(dist, 0);
+      c.stroke();
+    },
+    collide: function (other) {
+      this.remove();
+      var p = new Particles(5);
+      p.x = this.x;
+      p.y = this.y;
+      p.add();
+    },
+    derezz: function () {
+      badGuyCount--;
+      newBadGuy();
+    },
+
+    type: SPIDER,
+
+    collidesWith: GOOD_GUYS
+  };
+  Sprite(Spider);
 
 
   var Guy = function () {
@@ -291,7 +369,7 @@
 
     type: GUY,
 
-    collidesWith: BADA + SEEKER
+    collidesWith: BAD_GUYS
   };
   Sprite(Guy);
 
@@ -348,7 +426,7 @@
 
     type: BULLET,
 
-    collidesWith: BADA + SEEKER
+    collidesWith: BAD_GUYS
   };
   Sprite(Bullet);
 
@@ -388,7 +466,7 @@
 
     type: PULSE,
 
-    collidesWidth: BADA + SEEKER
+    collidesWidth: BAD_GUYS
   };
   Sprite(Pulse);
 
@@ -737,7 +815,7 @@
       } else {
         var baddie = new baddieClass();
         baddie.add();
-        baddie.rotation = rotation;
+        baddie.angle = rotation;
       }
 
       currentLevel.nextBaddie++;
@@ -781,7 +859,7 @@
       },
       bgcc: 3,
       badaSize: 2,
-      baddies: [Seeker, Bada, Bada, Bada, Bada]
+      baddies: [Spider, Bada, Bada, Bada, Bada]
     },
 
     {
