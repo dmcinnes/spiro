@@ -597,13 +597,12 @@
     var f = level.f;
     var z = zzTarget;
     var i=0;
-    var angle=TAU-step;
-    var w = f(angle,z);
-    var x1 = Math.cos(angle)*w;
-    var y1 = Math.sin(angle)*w;
-    angle = 0;
+    var w = f(0,z);
+    var x1 = Math.cos(0)*w;
+    var y1 = Math.sin(0)*w;
+    var angle=step;
     var x2, y2, x, y;
-    while (angle<TAU) {
+    while (angle <= TAU) {
       w = f(angle,z);
       x2 = Math.cos(angle)*w;
       y2 = Math.sin(angle)*w;
