@@ -291,6 +291,7 @@
       this.rot = tangentAngle(this.angle);
 
       this.updateSpriteCartesian();
+      this.index = segmentIndex(this.angle);
     },
     render: function (c) {
       c.strokeStyle='#06276F';
@@ -312,14 +313,47 @@
     renderLeg: function (c, side, face, aniOffset) {
       c.save();
       var ani = 10 * Math.sin(this.ani + aniOffset);
-      var reach = face * (30 + ani);
+      // reach is 20..40
+      var reach = 30 + ani;
+      var dist = 0;
+      var i = this.index;
+      // step through the segments to find one
+      // close enough to the current reach
+      while (dist < reach) {
+        i += face;
+        i = i % segmentCount;
+        if (i < 0) {
+          i = segmentCount-1;
+        }
+        dist += currentLevel.segments[i].length;
+      }
+      reach = dist;
+      // figure out the point at this segment
+      var rtheta = i * step;
+      var rdist = currentLevel.f(rtheta);
+      var x = Math.cos(rot + rtheta) * rdist;
+      var y = Math.sin(rot + rtheta) * rdist;
+      // calculate the angle between the spider and this
+      // new segment
+      var angle = Math.atan2(y - this.y, x - this.x);
+      if (face === -1) {
+        angle += PI;
+      }
+
       var halfReach = reach/2;
       // outer leg is 30
       var knuckle = Math.sqrt(30 * 30 - halfReach * halfReach);
+
+      // rotate the leg by the angle we just calculated
+      // taking into account the level rotation and the
+      // spider's rotation
+      c.rotate(angle - this.rot - rot);
+
+      // draw the leg
       c.beginPath();
       c.moveTo(0, 0);
-      c.lineTo(halfReach, knuckle * side);
-      c.lineTo(reach, 0);
+      c.lineTo(face * halfReach, knuckle * side);
+      c.lineTo(face * reach, 0);
       c.stroke();
       c.restore();
     },
@@ -666,8 +700,12 @@
 
   // get precalculated tangent
   function tangentAngle(theta) {
-    var i = Math.floor(segmentCount * theta / TAU);
+    var i = segmentIndex(theta);
     return (currentLevel.segments) ? currentLevel.segments[i].tangent : 0;
+  }
+
+  function segmentIndex(theta) {
+    return Math.floor(segmentCount * theta / TAU);
   }
 
   function addBada(position, length) {
