@@ -61,7 +61,12 @@
   var badGuyCount;
   var guy;
 
-  c.translate(305,305);
+  var savedLine;
+  var savedLineCanvas = document.createElement('canvas');
+  savedLineCanvas.width  = canvas.width;
+  savedLineCanvas.height = canvas.height;
+
+  c.translate(305, 305);
   c.lineWidth = 2;
 
   var SpritePrototype = {
@@ -655,9 +660,8 @@
     level.segments = segments;
   }
 
-  function renderLine(f,z,rot) {
+  function renderLineToContext(c,f,z,rot) {
     c.save();
-
     // scale it up
     var percent = zz/zzTarget;
     c.scale(percent, percent);
@@ -677,6 +681,26 @@
     c.shadowBlur='30';
     c.stroke();
     c.restore();
+  }
+
+  function renderLine(f,z,rot) {
+    if (zz === zzTarget) {
+      if (!savedLine) {
+        savedLine = savedLineCanvas.getContext('2d');
+        savedLine.clearRect(0, 0, 610, 610);
+        savedLine.save();
+        savedLine.translate(305, 305);
+        renderLineToContext(savedLine,f,z,0);
+        savedLine.restore();
+      }
+      c.save();
+      c.rotate(rot);
+      c.drawImage(savedLineCanvas, -305, -305);
+      c.restore();
+    } else {
+      savedLine = null;
+      renderLineToContext(c,f,z,rot);
+    }
   }
 
   // clamp theta to 0..2*PI
