@@ -614,9 +614,12 @@
   }
 
   function integrateLine() {
+    var index = segmentIndex(rot);
+    var segmentLength = (currentLevel.segments) ? currentLevel.segments[index].length : 1;
+    var currentMaxVel = 4 * maxRot/segmentLength;
     rotVel += rotAcc;
-    if (Math.abs(rotVel) > maxRot) {
-      rotVel = maxRot * Math.abs(rotVel)/rotVel;
+    if (Math.abs(rotVel) > currentMaxVel) {
+      rotVel = currentMaxVel * Math.abs(rotVel)/rotVel;
     }
 
     rot += rotVel;
