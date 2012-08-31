@@ -398,10 +398,10 @@
     },
 
     collide: function (other) {
-      var p = new Particles(10);
-      p.x = this.x;
-      p.y = this.y;
-      p.add();
+      // var p = new Particles(10);
+      // p.x = this.x;
+      // p.y = this.y;
+      // p.add();
       // this.remove();
     },
 
