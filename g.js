@@ -758,7 +758,7 @@
     var buckets = [];
     var sprite = headSprite;
     while (sprite) {
-      if (sprite.angle) {
+      if (sprite.angle !== undefined) {
         var pos = currentLevel.segments[segmentIndex(sprite.angle)].position;
         buckets[Math.floor(pos/bucketLength)] = true;
       }
@@ -928,6 +928,8 @@
     currentLevel.nextBaddie = 0;
     badGuyCount = 0;
 
+    // calculate with the correct zz
+    zz = zzTarget;
     precalculateLineSegments(currentLevel);
 
     // add first bad guys
