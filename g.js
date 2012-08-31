@@ -54,6 +54,7 @@
   var currentFramerate = 0;
   var BULLET_FIRE_TIMEOUT = 150;
   var currentBulletFireTimeout = 0;
+  var levelTimeout = 0;
   var freeBullets = [];
   var currentLevel;
   var pulseCount = 1;
@@ -913,7 +914,7 @@
       },
       bgcc: 3,
       badaSize: 3,
-      baddies: [Bada, Bada, Bada, Bada, Bada, Seeker]
+      baddies: [Spider, Bada, Bada, Bada, Bada, Seeker]
     },
 
     {
@@ -922,7 +923,7 @@
       },
       bgcc: 4,
       badaSize: 4,
-      baddies: [Bada, Bada, Bada, Bada, Bada, Seeker]
+      baddies: [Spider, Bada, Bada, Bada, Bada, Seeker]
     },
 
     {
@@ -931,7 +932,7 @@
       },
       bgcc: 4,
       badaSize: 4,
-      baddies: [Bada, Bada, Bada, Bada, Bada, Seeker, Bada, Seeker]
+      baddies: [Spider, Bada, Bada, Bada, Bada, Seeker, Bada, Seeker]
     },
 
     {
@@ -940,7 +941,7 @@
       },
       bgcc: 4,
       badaSize: 3,
-      baddies: [Bada, Bada, Bada, Bada, Bada, Seeker]
+      baddies: [Spider, Bada, Bada, Bada, Bada, Seeker]
     },
 
     {
@@ -949,7 +950,7 @@
       },
       bgcc: 3,
       badaSize: 2,
-      baddies: [Bada, Bada, Bada, Bada, Bada]
+      baddies: [Spider, Bada, Bada, Bada, Bada]
     }
   ];
 
@@ -982,7 +983,8 @@
     },
     runLevel: function (elapsed) {
       if (badGuyCount === 0 && currentLevelNumber+1 < levels.length) {
-        currentState = states.finishLevel;
+        levelTimeout = 1500;
+        currentState = states.runOutLevel;
       }
       if (!guy.alive) {
         currentState = states.guyDie;
@@ -991,6 +993,17 @@
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
       runSprites(elapsed);
+    },
+    runOutLevel: function (elapsed) {
+      if (levelTimeout > 0) {
+        levelTimeout -= elapsed;
+        handleControls(elapsed);
+        integrateLine();
+        renderLine(currentLevel.f,zz,rot);
+        runSprites(elapsed);
+      } else {
+        currentState = states.finishLevel;
+      }
     },
     finishLevel: function (elapsed) {
       if (zz < zzTarget*2) {
