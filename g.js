@@ -533,10 +533,7 @@
       for (var i = 0; i < count; i+=2) {
         var particleX = this.particleDirections[i];
         var particleY = this.particleDirections[i+1];
-        c.save();
-        c.translate(particleX * this.life/8, particleY * this.life/8);
-        c.fillRect(0,0,2,2);
-        c.restore();
+        c.fillRect(particleX * this.life/8, particleY * this.life/8,2,2);
       }
     }
   };
