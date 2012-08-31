@@ -636,6 +636,8 @@
     var segments = [];
     var f = level.f;
     var z = zzTarget;
+    var length;
+    var position = 0;
     var i=0;
     var w = f(0,z);
     var x1 = Math.cos(0)*w;
@@ -648,15 +650,19 @@
       y2 = Math.sin(angle)*w;
       x = x2 - x1;
       y = y2 - y1;
+      length = Math.sqrt(x*x + y*y);
       segments[i] = {
-        length: Math.sqrt(Math.pow(x,2) + Math.pow(y,2)),
-        tangent: Math.atan2(y, x)
+        length:   length,
+        position: position,
+        tangent:  Math.atan2(y, x)
       };
+      position += length;
       x1 = x2;
       y1 = y2;
       i++;
       angle+=step;
     }
+    level.totalLength = position;
     level.segments = segments;
   }
 
@@ -747,27 +753,38 @@
   }
 
   function findAFreeSpot() {
-    var sprite = headSprite;
+    var bucketCount = 20;
+    var bucketLength = Math.round(currentLevel.totalLength / bucketCount);
     var buckets = [];
-    var bucket = 0;
+    var sprite = headSprite;
     while (sprite) {
-      bucket = Math.floor(100 * sprite.angle / TAU);
-      buckets[bucket] = true;
+      if (sprite.angle) {
+        var pos = currentLevel.segments[segmentIndex(sprite.angle)].position;
+        buckets[Math.floor(pos/bucketLength)] = true;
+      }
       sprite = sprite.nextSprite;
     }
     // start random
-    bucket = Math.floor(Math.random() * 100);
+    var bucket = Math.floor(Math.random() * bucketCount);
     // traverse over the buckets
     var tries = 0;
-    while (buckets[bucket] && tries < 100) {
-      bucket = (bucket + 7) % 100;
+    while (buckets[bucket] && tries < bucketCount) {
+      bucket = (bucket + 7) % bucketCount;
       tries++;
     }
-    if (tries > 100) {
+    if (tries > bucketCount) {
       // no free spot
       return false;
     }
-    return bucket;
+    // find the angle this bucket belongs to
+    var i = 0;
+    // add a half bucket to get us centered
+    var position = (bucket + 0.5) * bucketLength;
+    while (position > 0) {
+      position -= currentLevel.segments[i].length;
+      i++;
+    }
+    return TAU * i / segmentCount;
   }
 
   function renderTitle(delta) {
@@ -911,10 +928,15 @@
     currentLevel.nextBaddie = 0;
     badGuyCount = 0;
 
+    precalculateLineSegments(currentLevel);
+
     // add first bad guys
     for (var i = 0; i < currentLevel.bgcc; i++) {
       newBadGuy();
     }
+
+    // clear zz for start up
+    zz = 0;
   }
 
 
@@ -998,7 +1020,6 @@
         zz += elapsed / 800;
       } else {
         zz = zzTarget;
-        precalculateLineSegments(currentLevel);
         pulseCount = 1;
         currentState = states.runLevel;
       }
@@ -1033,9 +1054,8 @@
       if (zz < zzTarget*2) {
         zz += elapsed / 800;
       } else {
-        zz = 0;
-        currentState = states.startLevel;
         startNewLevel();
+        currentState = states.startLevel;
       }
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
