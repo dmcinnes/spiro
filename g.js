@@ -160,7 +160,9 @@
       this.angle = clamp(this.angle + speed);
 
       this.dist = currentLevel.f(this.angle);
-      this.rot = tangentAngle(this.angle);
+
+      this.segment = segmentForAngle(this.angle);
+      this.rot = this.segment.tangent;
 
       this.updateSpriteCartesian();
     },
@@ -193,6 +195,8 @@
         newBadGuy();
       }
     },
+
+    halfWidth: 5,
 
     type: BADA,
 
@@ -242,6 +246,8 @@
       badGuyCount--;
       newBadGuy();
     },
+
+    halfWidth: 20,
 
     type: SEEKER,
 
@@ -294,7 +300,9 @@
       this.angle = clamp(this.angle + speed);
 
       this.dist = currentLevel.f(this.angle);
-      this.rot = tangentAngle(this.angle);
+
+      this.segment = segmentForAngle(this.angle);
+      this.rot = this.segment.tangent;
 
       this.updateSpriteCartesian();
       this.index = segmentIndex(this.angle);
@@ -375,6 +383,8 @@
       newBadGuy();
     },
 
+    halfWidth: 10,
+
     type: SPIDER,
 
     collidesWith: GOOD_GUYS
@@ -391,9 +401,13 @@
   Guy.prototype = {
     tick: function (delta) {
       this.dist = currentLevel.f(this.angle);
-      this.rot = tangentAngle(this.angle);
-      this.updateSpriteCartesian();
+
       this.angle = rot;
+
+      this.segment = segmentForAngle(this.angle);
+      this.rot = this.segment.tangent;
+
+      this.updateSpriteCartesian();
     },
 
     render: function (c) {
@@ -409,6 +423,8 @@
       // p.add();
       // this.remove();
     },
+
+    halfWidth: 10,
 
     type: GUY,
 
@@ -467,6 +483,8 @@
       this.remove();
     },
 
+    halfWidth: 1,
+
     type: BULLET,
 
     collidesWith: BAD_GUYS
@@ -485,9 +503,11 @@
       if (this.life <= 0) {
         this.remove();
       }
+
       var percent = this.life / Pulse.MAX_LIFE;
       this.angle = clamp(this.angle + this.dir * (percent / 30 + delta / 500));
       this.dist = currentLevel.f(this.angle);
+      this.segment = segmentForAngle(this.angle);
       this.updateSpriteCartesian();
     },
     render: function (c) {
@@ -506,6 +526,8 @@
       p.y = this.y;
       p.add();
     },
+
+    halfWidth: 5,
 
     type: PULSE,
 
@@ -576,16 +598,21 @@
 
   function checkCollisions(canidate) {
     var sprite = headSprite;
+    var segments = currentLevel.segments;
     while (sprite) {
       // Compare this sprite's type against
       // the canidate's bitmask.
       // If it's non-zero the sprites can interact
       if (sprite.type & canidate.collidesWith) {
-        // dumb distance comparison
-        if (sprite.distance(canidate) < 10) {
-          sprite.collide(canidate);
-          canidate.collide(sprite);
-        }
+
+        // if (sprite.segment && canidate.segment) {
+        // } else {
+          // dumb distance comparison
+          if (sprite.distance(canidate) < sprite.halfWidth + canidate.halfWidth) {
+            sprite.collide(canidate);
+            canidate.collide(sprite);
+          }
+        // }
       }
       sprite = sprite.nextSprite;
     }
@@ -731,8 +758,12 @@
 
   // get precalculated tangent
   function tangentAngle(theta) {
+    return segmentForAngle(theta).tangent;
+  }
+
+  function segmentForAngle(theta) {
     var i = segmentIndex(theta);
-    return (currentLevel.segments) ? currentLevel.segments[i].tangent : 0;
+    return currentLevel.segments[i];
   }
 
   function segmentIndex(theta) {
