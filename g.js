@@ -604,15 +604,34 @@
       // the canidate's bitmask.
       // If it's non-zero the sprites can interact
       if (sprite.type & canidate.collidesWith) {
+        var collision = false;
 
-        // if (sprite.segment && canidate.segment) {
-        // } else {
+        if (sprite.segment && canidate.segment) {
+          var spritePos   = sprite.segment.position;
+          var canidatePos = canidate.segment.position;
+          if (Math.abs(spritePos - canidatePos) > currentLevel.totalLength/2) {
+            if (spritePos < canidatePos) {
+              canidatePos -= currentLevel.totalLength;
+            } else {
+              spritePos -= currentLevel.totalLength;
+            }
+          }
+          var left  = spritePos - sprite.halfWidth - canidate.halfWidth - canidatePos;
+          var right = spritePos + sprite.halfWidth + canidate.halfWidth - canidatePos;
+          if (left < 0 && right > 0) {
+            collision = true;
+          }
+        } else {
           // dumb distance comparison
           if (sprite.distance(canidate) < sprite.halfWidth + canidate.halfWidth) {
-            sprite.collide(canidate);
-            canidate.collide(sprite);
+            collision = true;
           }
-        // }
+        }
+
+        if (collision) {
+          sprite.collide(canidate);
+          canidate.collide(sprite);
+        }
       }
       sprite = sprite.nextSprite;
     }
