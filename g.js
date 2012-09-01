@@ -505,7 +505,8 @@
       }
 
       var percent = this.life / Pulse.MAX_LIFE;
-      this.angle = clamp(this.angle + this.dir * (percent / 30 + delta / 500));
+      this.angleVel = this.dir * 6 * (1 - percent);
+      this.angle = clamp(this.angle + this.angleVel * delta/1000);
       this.dist = currentLevel.f(this.angle);
       this.segment = segmentForAngle(this.angle);
       this.updateSpriteCartesian();
