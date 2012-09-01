@@ -767,7 +767,7 @@
   }
 
   function segmentIndex(theta) {
-    return Math.floor(segmentCount * theta / TAU);
+    return Math.floor(segmentCount * clamp(theta) / TAU);
   }
 
   function addBada(position, length) {
