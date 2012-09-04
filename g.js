@@ -278,34 +278,59 @@
   })();
 
 
-  var Spider = function () {
-    this.ani = 0;
-    this.dist = 0;
+  var Spider = function (size) {
+    this.ani   = 0;
+    this.dist  = 0;
     this.scale = 0;
-    this.dir = 1;
+    this.dir   = 1;
+    this.size  = size || 3;
+    this.egg   = false;
   };
   Spider.prototype = {
     tick: function (delta) {
-      this.ani += delta / 200;
-      this.ani %= TAU;
-
-      this.angleVel = this.dir / 5;
-
-      if (this.scale < 1) {
-        this.scale += delta / 1000;
-      } else if (this.scale > 1) {
-        this.scale = 1;
+      if (this.egg) {
+        this.scale = this.size / 3;
+        this.x += this.velX * delta;
+        this.y += this.velY * delta;
+        if (this.outside()) {
+          this.remove();
+        }
+        this.hatchTime -= delta;
+        if (this.hatchTime < 0) {
+          this.angle = Math.atan2(this.y, this.x) - rot;
+          this.dist = currentLevel.f(this.angle);
+          var d = Math.sqrt(this.x * this.x + this.y * this.y);
+          if (Math.abs(d - this.dist) < this.halfWidth * 2) {
+            this.egg = false;
+          }
+        }
       }
 
-      this.angle = clamp(this.angle + this.angleVel * (delta / 1000));
+      // don't use else because egg could be set to false
+      // in if clause
+      if (!this.egg) {
+        this.ani += delta / 200;
+        this.ani %= TAU;
 
-      this.dist = currentLevel.f(this.angle);
+        this.angleVel = this.dir / 5;
 
-      this.segment = segmentForAngle(this.angle);
-      this.rot = this.segment.tangent;
+        var targetScale = 0.2 + 0.8 * this.size / 3;
+        if (this.scale < targetScale) {
+          this.scale += delta / 1000;
+        } else if (this.scale > targetScale) {
+          this.scale = targetScale;
+        }
 
-      this.updateSpriteCartesian();
-      this.index = segmentIndex(this.angle);
+        this.angle = clamp(this.angle + this.angleVel * (delta / 1000));
+
+        this.dist = currentLevel.f(this.angle);
+
+        this.segment = segmentForAngle(this.angle);
+        this.rot = this.segment.tangent;
+
+        this.updateSpriteCartesian();
+        this.index = segmentIndex(this.angle);
+      }
     },
     render: function (c) {
       c.strokeStyle='#06276F';
@@ -315,10 +340,12 @@
       c.translate(this.x, this.y);
       c.rotate(rot + this.rot);
       c.scale(this.scale, this.scale);
-      this.renderLeg(c,1,1,0);
-      this.renderLeg(c,-1,1,PI);
-      this.renderLeg(c,1,-1,3*PI/2);
-      this.renderLeg(c,-1,-1,PI/2);
+      if (!this.egg) {
+        this.renderLeg(c,1,1,0);
+        this.renderLeg(c,-1,1,PI);
+        this.renderLeg(c,1,-1,3*PI/2);
+        this.renderLeg(c,-1,-1,PI/2);
+      }
       c.beginPath();
       c.arc(0,0,10,0,TAU);
       c.closePath();
@@ -371,12 +398,32 @@
       c.stroke();
       c.restore();
     },
+    eggDirections: [-PI/4, -3*PI/4, PI/4, 3*PI/4],
     collide: function (other) {
       this.remove();
-      var p = new Particles(5);
-      p.x = this.x;
-      p.y = this.y;
-      p.add();
+      var size = this.size - 1;
+      if (!this.egg && size > 0) {
+        var tan = this.segment.tangent;
+        var dirStart = Math.floor(Math.random() * 4);
+        for (var i = 0; i < 3; i++) {
+          var s = new Spider(size);
+          var dir = tan + this.eggDirections[(dirStart + i) % 4];
+          s.egg = true;
+          s.hatchTime = 500;
+          s.x = this.x;
+          s.y = this.y;
+          s.scale = 1;
+          s.velX = Math.cos(dir) / 5;
+          s.velY = Math.sin(dir) / 5;
+          s.add();
+          badGuyCount++;
+        }
+      } else {
+        var p = new Particles(5);
+        p.x = this.x;
+        p.y = this.y;
+        p.add();
+      }
     },
     derezz: function () {
       badGuyCount--;
