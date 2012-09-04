@@ -606,40 +606,7 @@
       // the canidate's bitmask.
       // If it's non-zero the sprites can interact
       if (sprite.type & canidate.collidesWith) {
-        var collision = false;
-
-        if (sprite.segment && canidate.segment) {
-          var spritePos   = sprite.segment.position;
-          var canidatePos = canidate.segment.position;
-          if (Math.abs(spritePos - canidatePos) > currentLevel.totalLength/2) {
-            if (spritePos < canidatePos) {
-              canidatePos -= currentLevel.totalLength;
-            } else {
-              spritePos -= currentLevel.totalLength;
-            }
-          }
-          var left  = spritePos - sprite.halfWidth - canidate.halfWidth - canidatePos;
-          var right = spritePos + sprite.halfWidth + canidate.halfWidth - canidatePos;
-          if (sprite.velAngle < 0) {
-            left += sprite.velAngle * d;
-          } else if (sprite.velAngle > 0) {
-            right += sprite.velAngle * d;
-          }
-          var canLeft = 0;
-          var canRight = 0;
-          if (canidate.velAngle < 0) {
-            canLeft += canidate.velAngle * d;
-          } else if (canidate.velAngle > 0) {
-            canRight += canidate.velAngle * d;
-          }
-
-          collision = !(right < canLeft || left > canRight);
-        } else {
-          // dumb distance comparison
-          collision = (sprite.distance(canidate) < sprite.halfWidth + canidate.halfWidth);
-        }
-
-        if (collision) {
+        if (sprite.distance(canidate) < sprite.halfWidth + canidate.halfWidth) {
           sprite.collide(canidate);
           canidate.collide(sprite);
         }
