@@ -296,14 +296,25 @@
           this.remove();
         }
         this.hatchTime -= delta;
+        this.angle = Math.atan2(this.y, this.x) - rot;
+        this.dist = currentLevel.f(this.angle);
+        var d = Math.sqrt(this.x * this.x + this.y * this.y);
         if (this.hatchTime < 0) {
-          this.angle = Math.atan2(this.y, this.x) - rot;
-          this.dist = currentLevel.f(this.angle);
-          var d = Math.sqrt(this.x * this.x + this.y * this.y);
           if (Math.abs(d - this.dist) < this.halfWidth * 2) {
             this.egg = false;
           }
         }
+        // egg is attracted to the line
+        var angle = this.angle;
+        if (d > this.dist) {
+          angle += PI;
+        }
+        var change = delta / 500;
+        var dir = Math.atan2(this.velY, this.velX);
+        var diff = centerClamp(angle - dir);
+        dir += (diff < 0) ? -change : change;
+        this.velX = Math.cos(dir) * delta / 50;
+        this.velY = Math.sin(dir) * delta / 50;
       }
 
       // don't use else because egg could be set to false
@@ -413,8 +424,8 @@
           s.x = this.x;
           s.y = this.y;
           s.scale = 1;
-          s.velX = Math.cos(dir) / 5;
-          s.velY = Math.sin(dir) / 5;
+          s.velX = Math.cos(dir) / 20;
+          s.velY = Math.sin(dir) / 20;
           s.add();
           badGuyCount++;
         }
