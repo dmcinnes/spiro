@@ -597,7 +597,8 @@
     keyDown = false;
   }, false);
 
-  function checkCollisions(canidate) {
+  function checkCollisions(canidate, delta) {
+    var d = delta / 1000;
     var sprite = headSprite;
     var segments = currentLevel.segments;
     while (sprite) {
@@ -619,14 +620,23 @@
           }
           var left  = spritePos - sprite.halfWidth - canidate.halfWidth - canidatePos;
           var right = spritePos + sprite.halfWidth + canidate.halfWidth - canidatePos;
-          if (left < 0 && right > 0) {
-            collision = true;
+          if (sprite.velAngle < 0) {
+            left += sprite.velAngle * d;
+          } else if (sprite.velAngle > 0) {
+            right += sprite.velAngle * d;
           }
+          var canLeft = 0;
+          var canRight = 0;
+          if (canidate.velAngle < 0) {
+            canLeft += canidate.velAngle * d;
+          } else if (canidate.velAngle > 0) {
+            canRight += canidate.velAngle * d;
+          }
+
+          collision = !(right < canLeft || left > canRight);
         } else {
           // dumb distance comparison
-          if (sprite.distance(canidate) < sprite.halfWidth + canidate.halfWidth) {
-            collision = true;
-          }
+          collision = (sprite.distance(canidate) < sprite.halfWidth + canidate.halfWidth);
         }
 
         if (collision) {
@@ -935,7 +945,7 @@
       sprite.render(c);
       c.restore();
 
-      checkCollisions(sprite);
+      checkCollisions(sprite, elapsed);
 
       sprite = sprite.nextSprite;
     }
