@@ -289,7 +289,7 @@
       this.ani += delta / 200;
       this.ani %= TAU;
 
-      var speed = this.dir * delta / 5000;
+      this.angleVel = this.dir / 5;
 
       if (this.scale < 1) {
         this.scale += delta / 1000;
@@ -297,7 +297,7 @@
         this.scale = 1;
       }
 
-      this.angle = clamp(this.angle + speed);
+      this.angle = clamp(this.angle + this.angleVel * (delta / 1000));
 
       this.dist = currentLevel.f(this.angle);
 
