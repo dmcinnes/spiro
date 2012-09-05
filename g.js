@@ -183,6 +183,7 @@
       c.stroke();
     },
     collide: function (other) {
+      plusScore(other.type === GUY ? 25 : 50);
       this.remove();
       var p = new Particles(5);
       p.x = this.x;
@@ -190,7 +191,6 @@
       p.add();
     },
     derezz: function () {
-      plusScore(50);
       if (--this.group.count === 0) {
         badGuyCount--;
         newBadGuy();
@@ -237,6 +237,7 @@
       c.drawImage(Seeker.canvas, -25, -25);
     },
     collide: function (other) {
+      plusScore(other.type === GUY ? 250 : 500);
       this.remove();
       var p = new Particles(5);
       p.x = this.x;
@@ -244,7 +245,6 @@
       p.add();
     },
     derezz: function () {
-      plusScore(500);
       badGuyCount--;
       newBadGuy();
     },
@@ -413,6 +413,10 @@
     },
     eggDirections: [-PI/4, -3*PI/4, PI/4, 3*PI/4],
     collide: function (other) {
+      // smaller eggs worth more
+      var score = this.egg ? 4 - this.size : this.size;
+      plusScore((other.type === GUY ? 50 : 100) * score);
+
       this.remove();
       var size = this.size - 1;
       if (!this.egg && size > 0) {
@@ -439,12 +443,6 @@
       }
     },
     derezz: function () {
-      if (this.egg) {
-        // smaller eggs worth more
-        plusScore((4 - this.size) * 100);
-      } else {
-        plusScore(this.size * 100);
-      }
       badGuyCount--;
       newBadGuy();
     },
