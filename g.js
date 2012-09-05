@@ -759,6 +759,7 @@
     rot += rotVel;
     rot = clamp(rot);
     rotAcc = 0;
+    rotVel *= 0.99;
   }
 
   function precalculateLineSegments(level) {
