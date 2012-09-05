@@ -1140,6 +1140,9 @@
 
   startNewLevel(0);
 
+  //////////////
+  /// States ///
+  //////////////
 
   var states = {
     waitToBegin: function (elapsed) {
@@ -1206,6 +1209,11 @@
     }
   };
   var currentState = states.waitToBegin;
+
+
+  /////////////////
+  /// Main Loop ///
+  /////////////////
 
   function loop() {
     var thisFrame = timestamp();
