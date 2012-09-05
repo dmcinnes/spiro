@@ -1,13 +1,13 @@
 (function () {
 
   var GUY    = 1;
-  var BULLET = 2;
+  var BOLT = 2;
   var PULSE  = 4;
   var BADA   = 8;
   var SEEKER = 16;
   var SPIDER = 32;
 
-  var GOOD_GUYS = GUY + BULLET + PULSE;
+  var GOOD_GUYS = GUY + BOLT + PULSE;
   var BAD_GUYS  = BADA + SEEKER + SPIDER;
 
   requestAnimFrame = (function () {
@@ -52,10 +52,7 @@
   var secondCounter = 0;
   var lastFramerate = 0;
   var currentFramerate = 0;
-  var BULLET_FIRE_TIMEOUT = 150;
-  var currentBulletFireTimeout = 0;
   var levelTimeout = 0;
-  var freeBullets = [];
   var currentLevel;
   var pulseCount = 1;
   var badGuyCount;
@@ -516,12 +513,15 @@
     con.fillRect(-10, -3, 20, 6);
   })();
 
-  var Bullet = function () {
+  var Bolt = function () {
     this.rot = 0;
   };
-  Bullet.prototype = {
+  Bolt.BOLT_FIRE_TIMEOUT = 150;
+  Bolt.currentBoltFireTimeout = 0;
+  Bolt.freeBolts = [];
+
+  Bolt.prototype = {
     tick: function (delta) {
-      this.rot++;
       this.x += this.velX * delta;
       this.y += this.velY * delta;
       if (this.outside()) {
@@ -531,11 +531,10 @@
     render: function (c) {
       c.translate(this.x, this.y);
       c.rotate(this.rot);
-      c.fillStyle='#FFBE40';
-      c.fillRect(-2,-2,4,4);
+      c.drawImage(Bolt.canvas, -5, -80);
     },
     derezz: function () {
-      freeBullets.push(this);
+      Bolt.freeBolts.push(this);
     },
     collide: function (other) {
       this.remove();
@@ -543,11 +542,34 @@
 
     halfWidth: 1,
 
-    type: BULLET,
+    type: BOLT,
 
     collidesWith: BAD_GUYS
   };
-  Sprite(Bullet);
+  Sprite(Bolt);
+
+  // create bolt sprite
+  (function () {
+    Bolt.canvas = document.createElement('canvas');
+    Bolt.canvas.width=10;
+    Bolt.canvas.height=160;
+    var con = Bolt.canvas.getContext('2d');
+    con.lineWidth = 2;
+    con.lineCap = 'round';
+    con.beginPath();
+    con.moveTo(5, 5);
+    con.lineTo(5, 155);
+    con.closePath();
+    con.shadowBlur='10';
+    con.shadowColor='#FFCF73';
+    con.strokeStyle='#6C8DD5';
+    con.stroke();
+  })();
+
+  for (var i = 0; i < 6; i++) {
+    Bolt.freeBolts.push(new Bolt());
+  }
+
 
   var Pulse = function (start, dir) {
     this.angle = start;
@@ -674,19 +696,20 @@
   }
 
   function fire(direction) {
-    if (freeBullets.length) {
-      var bullet = freeBullets.pop();
-      bullet.x = guy.x;
-      bullet.y = guy.y;
+    if (Bolt.freeBolts.length) {
+      var bolt = Bolt.freeBolts.pop();
+      bolt.x = guy.x;
+      bolt.y = guy.y;
       var angle = guy.rot + rot;
       if (direction === 'up') {
         angle -= PI/2;
       } else {
         angle -= 3*PI/2;
       }
-      bullet.velX = Math.cos(angle);
-      bullet.velY = Math.sin(angle);
-      bullet.add();
+      bolt.rot = guy.rot + rot;
+      bolt.velX = Math.cos(angle) * 3;
+      bolt.velY = Math.sin(angle) * 3;
+      bolt.add();
     }
   }
 
@@ -951,9 +974,9 @@
       }
     }
     if (KEYS.x) {
-      currentBulletFireTimeout -= elapsed;
-      if (currentBulletFireTimeout < 0) {
-        currentBulletFireTimeout = BULLET_FIRE_TIMEOUT;
+      Bolt.currentBoltFireTimeout -= elapsed;
+      if (Bolt.currentBoltFireTimeout < 0) {
+        Bolt.currentBoltFireTimeout = Bolt.BOLT_FIRE_TIMEOUT;
         fire('up');
         fire('down');
       }
@@ -1087,10 +1110,6 @@
       baddies: [Spider, Bada, Bada, Bada, Bada]
     }
   ];
-
-  for (var i = 0; i < 6; i++) {
-    freeBullets.push(new Bullet());
-  }
 
   startNewLevel(0);
 
