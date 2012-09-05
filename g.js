@@ -555,7 +555,6 @@
     Bolt.canvas = document.createElement('canvas');
     Bolt.canvas.width=10;
     Bolt.canvas.height=Bolt.size;
-    console.log(Bolt.size);
     var con = Bolt.canvas.getContext('2d');
     con.lineWidth = 2;
     con.lineCap = 'round';
