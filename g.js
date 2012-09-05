@@ -85,6 +85,16 @@
       }
     },
     add: function () {
+      this.alive = true;
+      this.link();
+    },
+    remove: function () {
+      this.alive = false;
+      this.derezz();
+    },
+    link: function () {
+      this.prevSprite = null;
+      this.nextSprite = null;
       if (tailSprite) {
         tailSprite.nextSprite = this;
         this.prevSprite = tailSprite;
@@ -92,10 +102,8 @@
         headSprite = this;
       }
       tailSprite = this;
-
-      this.alive = true;
     },
-    remove: function () {
+    unlink: function () {
       if (this.prevSprite) {
         this.prevSprite.nextSprite = this.nextSprite;
       } else {
@@ -106,13 +114,6 @@
       } else {
         tailSprite = this.prevSprite;
       }
-      // clear for further use
-      this.prevSprite = null;
-      this.nextSprite = null;
-
-      this.alive = false;
-      
-      this.derezz();
     },
     distance: function (other) {
       return Math.sqrt(Math.pow(this.x - other.x,2) + Math.pow(this.y - other.y,2));
@@ -706,12 +707,15 @@
   }
 
   function checkCollisions(canidate, delta) {
+    if (!canidate.alive) {
+      return;
+    }
     var sprite = headSprite;
     while (sprite) {
       // Compare this sprite's type against
       // the canidate's bitmask.
       // If it's non-zero the sprites can interact
-      if (sprite.type & canidate.collidesWith) {
+      if (sprite.alive && sprite.type & canidate.collidesWith) {
         var collision = false;
         if (sprite.type === BOLT) {
           collision = checkBoltCollision(sprite, canidate);
@@ -723,6 +727,9 @@
         if (collision) {
           sprite.collide(canidate);
           canidate.collide(sprite);
+          if (!canidate.alive) {
+            return;
+          }
         }
       }
       sprite = sprite.nextSprite;
@@ -1032,6 +1039,15 @@
 
       sprite = sprite.nextSprite;
     }
+
+    // cull removed sprites
+    sprite = headSprite;
+    while (sprite) {
+      if (!sprite.alive) {
+        sprite.unlink();
+      }
+      sprite = sprite.nextSprite;
+    }
   }
 
   function newBadGuy() {
@@ -1058,7 +1074,7 @@
     // remove existing sprites
     var sprite = tailSprite;
     while (sprite) {
-      sprite.remove();
+      sprite.unlink();
       sprite = tailSprite;
     }
 
