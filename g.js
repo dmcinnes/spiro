@@ -57,6 +57,7 @@
   var pulseCount = 1;
   var badGuyCount;
   var guy;
+  var framerate = false;
 
   var savedLine;
   var savedLineCanvas = document.createElement('canvas');
@@ -669,8 +670,13 @@
 
   window.addEventListener('keydown', function (e) {
     KEYS[KEY_CODES[e.keyCode]] = true;
-    if (e.keyCode === 80) {
-      pause();
+    switch (e.keyCode) {
+      case 80: // p
+        pause();
+        break;
+      case 70: // f
+        framerate = !framerate;
+        break;
     }
     keyDown = true;
   }, false);
@@ -1214,7 +1220,9 @@
 
     currentState(elapsed);
 
-    renderFramerate(elapsed);
+    if (framerate) {
+      renderFramerate(elapsed);
+    }
 
     if (running) {
       requestAnimFrame(loop, canvas);
