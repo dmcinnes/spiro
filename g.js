@@ -516,6 +516,7 @@
   var Bolt = function () {
     this.rot = 0;
   };
+  Bolt.size = 160;
   Bolt.BOLT_FIRE_TIMEOUT = 150;
   Bolt.currentBoltFireTimeout = 0;
   Bolt.freeBolts = [];
@@ -531,7 +532,7 @@
     render: function (c) {
       c.translate(this.x, this.y);
       c.rotate(this.rot);
-      c.drawImage(Bolt.canvas, -5, -80);
+      c.drawImage(Bolt.canvas, -5, -Bolt.size/2);
     },
     derezz: function () {
       Bolt.freeBolts.push(this);
@@ -540,7 +541,7 @@
       this.remove();
     },
 
-    halfWidth: 1,
+    halfWidth: 14,
 
     type: BOLT,
 
@@ -552,13 +553,14 @@
   (function () {
     Bolt.canvas = document.createElement('canvas');
     Bolt.canvas.width=10;
-    Bolt.canvas.height=160;
+    Bolt.canvas.height=Bolt.size;
+    console.log(Bolt.size);
     var con = Bolt.canvas.getContext('2d');
     con.lineWidth = 2;
     con.lineCap = 'round';
     con.beginPath();
     con.moveTo(5, 5);
-    con.lineTo(5, 155);
+    con.lineTo(5, Bolt.size-5);
     con.closePath();
     con.shadowBlur='10';
     con.shadowColor='#FFCF73';
@@ -677,16 +679,35 @@
     keyDown = false;
   }, false);
 
+  function checkBoltCollision(bolt, sprite) {
+    var boltNormal = bolt.rot;
+    var normX = -bolt.velY;
+    var normY = bolt.velX;
+    var boltNormProj = bolt.x * normX + bolt.y * normY;
+    var spriteNormProj = sprite.x * normX + sprite.y * normY;
+    var dirX = sprite.x - bolt.x;
+    var dirY = sprite.y - bolt.y;
+    var boltProj = dirX * bolt.velX + dirY * bolt.velY;
+    return Math.abs(boltNormProj - spriteNormProj) < bolt.halfWidth + sprite.halfWidth &&
+           Math.abs(boltProj) < Bolt.size;
+  }
+
   function checkCollisions(canidate, delta) {
-    var d = delta / 1000;
     var sprite = headSprite;
-    var segments = currentLevel.segments;
     while (sprite) {
       // Compare this sprite's type against
       // the canidate's bitmask.
       // If it's non-zero the sprites can interact
       if (sprite.type & canidate.collidesWith) {
-        if (sprite.distance(canidate) < sprite.halfWidth + canidate.halfWidth) {
+        var collision = false;
+        if (sprite.type === BOLT) {
+          collision = checkBoltCollision(sprite, canidate);
+        } else if (canidate.type === BOLT) {
+          collision = checkBoltCollision(canidate, sprite);
+        } else {
+          collision = (sprite.distance(canidate) < sprite.halfWidth + canidate.halfWidth);
+        }
+        if (collision) {
           sprite.collide(canidate);
           canidate.collide(sprite);
         }
