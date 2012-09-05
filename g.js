@@ -58,6 +58,8 @@
   var badGuyCount;
   var guy;
   var framerate = false;
+  var score = 0;
+  var scoreNode = document.getElementById('s');
 
   var savedLine;
   var savedLineCanvas = document.createElement('canvas');
@@ -188,6 +190,7 @@
       p.add();
     },
     derezz: function () {
+      plusScore(50);
       if (--this.group.count === 0) {
         badGuyCount--;
         newBadGuy();
@@ -241,6 +244,7 @@
       p.add();
     },
     derezz: function () {
+      plusScore(500);
       badGuyCount--;
       newBadGuy();
     },
@@ -435,6 +439,12 @@
       }
     },
     derezz: function () {
+      if (this.egg) {
+        // smaller eggs worth more
+        plusScore((4 - this.size) * 100);
+      } else {
+        plusScore(this.size * 100);
+      }
       badGuyCount--;
       newBadGuy();
     },
@@ -1077,6 +1087,18 @@
     zz = 0;
   }
 
+  function plusScore(val) {
+    score += val;
+    scoreNode.innerHTML = score;
+  }
+  function showScore() {
+    scoreNode.innerHTML = score;
+    scoreNode.style.display = 'block';
+  }
+  function hideScore() {
+    scoreNode.style.display = 'none';
+  }
+
 
   //////////////
   /// Levels ///
@@ -1149,6 +1171,7 @@
       renderTitle(elapsed);
       if (keyDown) {
         zz = 0;
+        showScore();
         currentState = states.startLevel;
       }
     },
