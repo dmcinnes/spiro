@@ -24,8 +24,30 @@
     color: #06276F;
     font: bold large Impact, Helvetica, sans-serif;
   }
+  #u{
+    position:absolute;
+    left:50%;
+    z-index:15;
+    bottom:100px;
+    color: #BF8F30;
+    font: bold 200% Verdana, Helvetica, sans-serif;
+    text-shadow: 0 2px 5px #06276F;
+    opacity: 0;
+  }
+  #u div{
+    position:relative;
+    left:-50%;
+    cursor:pointer;
+  }
+  #u div:hover {
+    color: #FFA900;
+    text-shadow: 0 3px 5px #06276F;
+  }
 </style>
 <div id="m">
+  <div id="u">
+    <div id="start">START</div>
+  </div>
   <canvas id="c" width="610" height="610"></canvas>
   <div id="s"/>
 </div>

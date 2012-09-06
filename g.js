@@ -60,6 +60,8 @@
   var framerate = false;
   var score = 0;
   var scoreNode = document.getElementById('s');
+  var menuNode  = document.getElementById('u');
+  var titleOffset = 0;
 
   var savedLine;
   var savedLineCanvas = document.createElement('canvas');
@@ -693,6 +695,13 @@
     keyDown = false;
   }, false);
 
+  document.getElementById('start').addEventListener('click', function (e) {
+    // start game
+    currentState = states.begin;
+  });
+
+
+
   function checkBoltCollision(bolt, sprite) {
     var boltNormal = bolt.rot;
     var normX = -bolt.velY;
@@ -939,7 +948,18 @@
   }
 
   function renderTitle(delta) {
+    if (titleOffset > -120) {
+      if (titleOffset < -60) {
+        var cos = Math.cos(-(titleOffset + 60) * PI/120);
+        titleOffset -= cos * delta / 10;
+        menuNode.style.opacity = 1-cos;
+      } else {
+        titleOffset -= delta / 10;
+      }
+    }
+
     c.save();
+    c.translate(0, titleOffset);
     c.strokeStyle='#FFA900';
     c.shadowOffsetX=4;
     c.shadowOffsetY=2;
@@ -1183,11 +1203,12 @@
   var states = {
     waitToBegin: function (elapsed) {
       renderTitle(elapsed);
-      if (keyDown) {
-        zz = 0;
-        showScore();
-        currentState = states.startLevel;
-      }
+    },
+    begin: function () {
+      menuNode.style.display = 'none';
+      zz = 0;
+      showScore();
+      currentState = states.startLevel;
     },
     startLevel: function (elapsed) {
       if (zz < zzTarget) {
