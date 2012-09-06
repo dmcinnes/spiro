@@ -1,11 +1,11 @@
 (function () {
 
-  var GUY    = 1;
-  var BOLT = 2;
-  var PULSE  = 4;
-  var BADA   = 8;
-  var SEEKER = 16;
-  var SPIDER = 32;
+  var GUY    = 1,
+      BOLT   = 2,
+      PULSE  = 4,
+      BADA   = 8,
+      SEEKER = 16,
+      SPIDER = 32;
 
   var GOOD_GUYS = GUY + BOLT + PULSE;
   var BAD_GUYS  = BADA + SEEKER + SPIDER;
@@ -30,42 +30,43 @@
     timestamp = Date.now;
   }
 
-  var PI  = Math.PI;
-  var TAU = 2*PI; // http://tauday.com/
-  var gameWidth = 600;
-  var maxRadius = gameWidth / 2;
-  var canvas = document.getElementById('c');
-  var c = canvas.getContext('2d');
-  var segmentCount = 360;
-  var step = TAU/segmentCount;
-  var running = true;
-  var tailSprite = null;
-  var headSprite = null;
-  var zz = 0;
-  var zzTarget = 2;
-  var lastFrame = timestamp();
-  var rotAcc = 0;
-  var rotVel = 0;
-  var rot = 0;
-  var maxRot = 0.04;
-  var frameCount = 0;
-  var secondCounter = 0;
-  var lastFramerate = 0;
-  var currentFramerate = 0;
-  var levelTimeout = 0;
-  var currentLevel;
-  var pulseCount = 1;
-  var badGuyCount;
-  var guy;
-  var framerate = false;
-  var score = 0;
-  var scoreNode = document.getElementById('s');
-  var menuNode  = document.getElementById('u');
-  var instructionsNode = document.getElementById('i');
-  var titleOffset = 0;
+  var PI  = Math.PI,
+      TAU = 2*PI, // http://tauday.com/
+      gameWidth = 600,
+      maxRadius = gameWidth / 2,
+      canvas = document.getElementById('c'),
+      c = canvas.getContext('2d'),
+      segmentCount = 360,
+      step = TAU/segmentCount,
+      running = true,
+      tailSprite = null,
+      headSprite = null,
+      zz = 0,
+      zzTarget = 2,
+      lastFrame = timestamp(),
+      rotAcc = 0,
+      rotVel = 0,
+      rot = 0,
+      maxRot = 0.04,
+      frameCount = 0,
+      secondCounter = 0,
+      lastFramerate = 0,
+      currentFramerate = 0,
+      levelTimeout = 0,
+      currentLevel,
+      pulseCount = 1,
+      badGuyCount,
+      guy,
+      framerate = false,
+      score = 0,
+      scoreNode = document.getElementById('s'),
+      menuNode  = document.getElementById('u'),
+      instructionsNode = document.getElementById('i'),
+      titleOffset = 0,
 
-  var savedLine;
-  var savedLineCanvas = document.createElement('canvas');
+      savedLine,
+      savedLineCanvas = document.createElement('canvas');
+
   savedLineCanvas.width  = canvas.width;
   savedLineCanvas.height = canvas.height;
 
