@@ -971,7 +971,7 @@
       }
 
       c.save();
-      c.translate(0, titleOffset);
+      c.translate(10, titleOffset);
       c.strokeStyle='#FFA900';
       c.shadowOffsetX=4;
       c.shadowOffsetY=2;
