@@ -8,7 +8,7 @@ yuicompressor -v -o pkg/g.js g.js
 cd pkg
 echo ''
 echo 'ZIPPING...'
-zip game.zip index.html g.js
+zip -9 game.zip index.html g.js
 cd ..
 echo ''
 echo 'SIZE: '
