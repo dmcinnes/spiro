@@ -948,14 +948,16 @@
   }
 
   function renderTitle(delta) {
-    if (titleOffset > -120) {
-      if (titleOffset < -60) {
-        var cos = Math.cos(-(titleOffset + 60) * PI/120);
+    if (titleOffset < -60) {
+      var cos = Math.cos(-(titleOffset + 60) * PI/120);
+      // cut it off
+      if (cos > 0.01) {
         titleOffset -= cos * delta / 10;
         menuNode.style.opacity = 1-cos;
-      } else {
-        titleOffset -= delta / 10;
+        menuNode.style.bottom = (1-cos) * 100;
       }
+    } else {
+      titleOffset -= delta / 10;
     }
 
     c.save();
