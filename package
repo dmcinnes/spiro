@@ -1,0 +1,15 @@
+#!/bin/sh
+
+rm -r pkg
+mkdir pkg
+cp index.html pkg/
+echo 'COMPRESSING...'
+yuicompressor -v -o pkg/g.js g.js
+cd pkg
+echo ''
+echo 'ZIPPING...'
+zip game.zip index.html g.js
+cd ..
+echo ''
+echo 'SIZE: '
+ls -l pkg/game.zip | awk '{ print $5 }'
