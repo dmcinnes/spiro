@@ -1090,14 +1090,16 @@
   function runSprites(elapsed) {
     var sprite = headSprite;
     while (sprite) {
-      // tick with 0 until the game really starts
-      sprite.tick((zz === zzTarget) ? elapsed : 0);
+      if (sprite.alive) {
+        // tick with 0 until the game really starts
+        sprite.tick((zz === zzTarget) ? elapsed : 0);
 
-      c.save();
-      sprite.render(c);
-      c.restore();
+        c.save();
+        sprite.render(c);
+        c.restore();
 
-      checkCollisions(sprite, elapsed);
+        checkCollisions(sprite, elapsed);
+      }
 
       sprite = sprite.nextSprite;
     }
