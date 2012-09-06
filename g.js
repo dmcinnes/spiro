@@ -61,6 +61,7 @@
   var score = 0;
   var scoreNode = document.getElementById('s');
   var menuNode  = document.getElementById('u');
+  var instructionsNode = document.getElementById('i');
   var titleOffset = 0;
 
   var savedLine;
@@ -947,64 +948,91 @@
     return TAU * i / segmentCount;
   }
 
-  function renderTitle(delta) {
-    if (titleOffset < -60) {
-      var cos = Math.cos(-(titleOffset + 60) * PI/120);
-      // cut it off
-      if (cos > 0.01) {
-        titleOffset -= cos * delta / 10;
-        menuNode.style.opacity = 1-cos;
-        menuNode.style.bottom = (1-cos) * 100;
-      }
-    } else {
-      titleOffset -= delta / 10;
-    }
 
-    c.save();
-    c.translate(0, titleOffset);
-    c.strokeStyle='#FFA900';
-    c.shadowOffsetX=4;
-    c.shadowOffsetY=2;
-    c.shadowColor='#BF8F30';
-    c.lineJoin = "round";
-    c.translate(-140, -100);
-    c.scale(2,2);
-    // S
-    c.beginPath();
-    c.moveTo(24, 0);
-    c.bezierCurveTo(-40, 0, 70, 100, 0, 100);
-    c.stroke();
-    // P
-    c.translate(34, 0);
-    c.beginPath();
-    c.moveTo(0, 100);
-    c.lineTo(0, 0);
-    c.bezierCurveTo(30, 0, 30, 50, 0, 50);
-    c.stroke();
-    // I
-    c.translate(32, 0);
-    c.beginPath();
-    c.moveTo(0, 0);
-    c.lineTo(0, 100);
-    c.stroke();
-    // R
-    c.translate(12, 0);
-    c.beginPath();
-    c.moveTo(0, 100);
-    c.lineTo(0, 0);
-    c.bezierCurveTo(30, 0, 30, 50, 0, 50);
-    c.lineTo(20, 100);
-    c.stroke();
-    // O
-    c.translate(30, 0);
-    c.beginPath();
-    c.moveTo(10, 0);
-    c.bezierCurveTo(-4, 0, -4, 100, 10, 100);
-    c.bezierCurveTo(24, 100, 24, 0, 10, 0);
-    c.stroke();
- 
-    c.restore();
-  }
+  //////////////
+  /// Titles ///
+  //////////////
+
+  var Titles = {
+    renderTitle: function (delta) {
+      var done = false;
+      if (titleOffset < -60) {
+        var cos = Math.cos(-(titleOffset + 60) * PI/120);
+        // cut it off
+        if (cos > 0.01) {
+          titleOffset -= cos * delta / 10;
+          menuNode.style.opacity = 1-cos;
+          menuNode.style.bottom = (1-cos) * 60;
+        } else {
+          done = true;
+        }
+      } else {
+        titleOffset -= delta / 10;
+      }
+
+      c.save();
+      c.translate(0, titleOffset);
+      c.strokeStyle='#FFA900';
+      c.shadowOffsetX=4;
+      c.shadowOffsetY=2;
+      c.shadowColor='#BF8F30';
+      c.lineJoin = "round";
+      c.translate(-140, -100);
+      c.scale(2,2);
+      // S
+      c.beginPath();
+      c.moveTo(24, 0);
+      c.bezierCurveTo(-40, 0, 70, 100, 0, 100);
+      c.stroke();
+      // P
+      c.translate(34, 0);
+      c.beginPath();
+      c.moveTo(0, 100);
+      c.lineTo(0, 0);
+      c.bezierCurveTo(30, 0, 30, 50, 0, 50);
+      c.stroke();
+      // I
+      c.translate(32, 0);
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.lineTo(0, 100);
+      c.stroke();
+      // R
+      c.translate(12, 0);
+      c.beginPath();
+      c.moveTo(0, 100);
+      c.lineTo(0, 0);
+      c.bezierCurveTo(30, 0, 30, 50, 0, 50);
+      c.lineTo(20, 100);
+      c.stroke();
+      // O
+      c.translate(30, 0);
+      c.beginPath();
+      c.moveTo(10, 0);
+      c.bezierCurveTo(-4, 0, -4, 100, 10, 100);
+      c.bezierCurveTo(24, 100, 24, 0, 10, 0);
+      c.stroke();
+   
+      c.restore();
+
+      return done;
+    },
+    renderInstructions: function (delta) {
+      var children = instructionsNode.children;
+      var o = 0;
+      for (var i = 0; i < children.length; i++) {
+        var n = children[i];
+        var nOpacity = parseFloat(n.style.opacity, 10) || 0;
+        o += nOpacity;
+        if (o < (i+1)) {
+          n.style.opacity = nOpacity + delta / 1000;
+          return false;
+        }
+      }
+      return true;
+    }
+  };
+
 
   function renderFramerate(delta) {
     frameCount++;
@@ -1204,10 +1232,12 @@
 
   var states = {
     waitToBegin: function (elapsed) {
-      renderTitle(elapsed);
+      Titles.renderTitle(elapsed) &&
+      Titles.renderInstructions(elapsed);
     },
     begin: function () {
       menuNode.style.display = 'none';
+      instructionsNode.style.display = 'none';
       zz = 0;
       showScore();
       currentState = states.startLevel;

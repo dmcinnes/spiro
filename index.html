@@ -30,7 +30,7 @@
     left:50%;
     z-index:15;
     bottom:100px;
-    color: #BF8F30;
+    color: #FFA900;
     font: bold 200% Verdana, Helvetica, sans-serif;
     text-shadow: 0 2px 5px #06276F;
     opacity: 0;
@@ -39,13 +39,38 @@
     position:relative;
     left:-50%;
     cursor:pointer;
+    text-align:center;
   }
   #u div:hover {
-    color: #FFA900;
+    color: #FFCF73;
     text-shadow: 0 3px 5px #06276F;
+  }
+  #i{
+    position:absolute;
+    width:500px;
+    left:50%;
+    z-index:15;
+    bottom:120px;
+    color: #4573D5;
+    text-shadow: 0 1px 1px #06276F, 0 -1px 1px #06276F;
+    font: bold 90% Verdana, Helvetica, sans-serif;
+  }
+  #i p{
+    position:relative;
+    left:-50%;
+    text-align:center;
+    opacity:0;
+  }
+  #i p b{
+    color: #FFCF73;
   }
 </style>
 <div id="m">
+  <div id="i">
+    <p>Use <b>&larr;&nbsp;&rarr;</b> to move, <b>X</b> to fire and <b>SPACE</b> to release a Line Pulse</p>
+    <p>You get one new Line Pulse per Level</p>
+    <p>Destroy all enemies to advance to the Next Level</p>
+  </div>
   <div id="u">
     <div id="start">START</div>
   </div>
