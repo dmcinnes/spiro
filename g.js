@@ -466,6 +466,7 @@
     this.rot = 0;
     this.x = 0;
     this.y = 0;
+    this.flash = 0;
   };
   Guy.prototype = {
     tick: function (delta) {
@@ -477,15 +478,25 @@
       this.rot = this.segment.tangent;
 
       this.updateSpriteCartesian();
+
+      if (this.flash > 0) {
+        this.flash -= delta;
+      }
     },
 
     render: function (c) {
       c.translate(this.x, this.y);
       c.rotate(rot + this.rot);
       c.drawImage(Guy.canvas, -15, -10);
+      if (this.flash > 0) {
+        c.globalCompositeOperation = 'lighter';
+        c.globalAlpha = this.flash / 800;
+        c.drawImage(Guy.canvas, -15, -10);
+      }
     },
 
     collide: function (other) {
+      this.flash = 800;
       // var p = new Particles(10);
       // p.x = this.x;
       // p.y = this.y;
