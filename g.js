@@ -48,16 +48,11 @@
       rotVel = 0,
       rot = 0,
       maxRot = 0.04,
-      frameCount = 0,
-      secondCounter = 0,
-      lastFramerate = 0,
-      currentFramerate = 0,
       levelTimeout = 0,
       currentLevel,
       pulseCount = 1,
       badGuyCount,
       guy,
-      framerate = false,
       score = 0,
       scoreNode = document.getElementById('s'),
       menuNode  = document.getElementById('u'),
@@ -693,15 +688,10 @@
 
   window.addEventListener('keydown', function (e) {
     KEYS[KEY_CODES[e.keyCode]] = true;
-    switch (e.keyCode) {
-      case 80: // p
-        pause();
-        break;
-      case 70: // f
-        framerate = !framerate;
-        break;
-    }
     keyDown = true;
+    if (e.keyCode === 80) {
+      pause();
+    }
   }, false);
   window.addEventListener('keyup', function (e) {
     KEYS[KEY_CODES[e.keyCode]] = false;
@@ -1046,23 +1036,6 @@
   };
 
 
-  function renderFramerate(delta) {
-    frameCount++;
-    secondCounter += delta;
-    if (secondCounter > 500) {
-      lastFramerate = currentFramerate;
-      currentFramerate = frameCount;
-      frameCount = 0;
-      secondCounter = 0;
-    }
-
-    c.save();
-    c.translate(-280, -280);
-    c.scale(2, 2);
-    c.fillText(currentFramerate + lastFramerate, 0, 0);
-    c.restore();
-  }
-
   function handleControls(elapsed) {
     if (KEYS.left) {
       rotAcc = -elapsed / 10000;
@@ -1331,10 +1304,6 @@
     c.clearRect(-305, -305, 610, 610);
 
     currentState(elapsed);
-
-    if (framerate) {
-      renderFramerate(elapsed);
-    }
 
     if (running) {
       requestAnimFrame(loop, canvas);
