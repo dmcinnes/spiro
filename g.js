@@ -185,9 +185,7 @@
     collide: function (other) {
       plusScore(other.type === GUY ? 25 : 50);
       this.remove();
-      var p = new Particles(5);
-      p.x = this.x;
-      p.y = this.y;
+      var p = new Particles(5, this);
       p.add();
     },
     derezz: function () {
@@ -239,9 +237,7 @@
     collide: function (other) {
       plusScore(other.type === GUY ? 250 : 500);
       this.remove();
-      var p = new Particles(5);
-      p.x = this.x;
-      p.y = this.y;
+      var p = new Particles(5, this);
       p.add();
     },
     derezz: function () {
@@ -436,9 +432,7 @@
           badGuyCount++;
         }
       } else {
-        var p = new Particles(5);
-        p.x = this.x;
-        p.y = this.y;
+        var p = new Particles(5, this);
         p.add();
       }
     },
@@ -492,9 +486,7 @@
 
     collide: function (other) {
       this.flash = 800;
-      // var p = new Particles(10);
-      // p.x = this.x;
-      // p.y = this.y;
+      // var p = new Particles(10, this);
       // p.add();
       // this.remove();
     },
@@ -623,9 +615,7 @@
       c.fill();
     },
     derezz: function () {
-      var p = new Particles(3);
-      p.x = this.x;
-      p.y = this.y;
+      var p = new Particles(3, this);
       p.add();
     },
 
@@ -637,7 +627,9 @@
   };
   Sprite(Pulse);
 
-  var Particles = function (count) {
+  var Particles = function (count, origin) {
+    this.x = origin.x;
+    this.y = origin.y;
     this.life = 0;
     this.particleDirections = [];
     for (var i=0; i < count; i++) {
