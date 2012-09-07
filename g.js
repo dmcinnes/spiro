@@ -452,6 +452,7 @@
 
   var Jelly = function () {
     this.ani = 0;
+    this.spawnTimeout = 0;
     this.setPosition();
   };
   Jelly.prototype = {
@@ -476,14 +477,19 @@
       this.x += this.velX * delta;
       this.y += this.velY * delta;
 
-      this.angle = Math.atan2(this.y, this.x) - rot;
-      this.dist = currentLevel.f(this.angle);
-      var d = Math.sqrt(this.x * this.x + this.y * this.y);
-      if (Math.abs(d - this.dist) < 1) {
-        addBada(this.angle, 1);
-        badGuyCount++;
-        var p = new Particles(5, this, true, '#06276F');
-        p.add();
+      if (this.spawnTimeout < 0) {
+        this.angle = Math.atan2(this.y, this.x) - rot;
+        this.dist = currentLevel.f(this.angle);
+        var d = Math.sqrt(this.x * this.x + this.y * this.y);
+        if (Math.abs(d - this.dist) < 1) {
+          addBada(this.angle, 1);
+          badGuyCount++;
+          var p = new Particles(5, this, true, '#6C8DD5');
+          p.add();
+          this.spawnTimeout = 1000;
+        }
+      } else {
+        this.spawnTimeout -= delta;
       }
 
       if (this.x * this.x + this.y * this.y > this.range &&
