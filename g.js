@@ -452,6 +452,11 @@
 
   var Jelly = function () {
     this.ani = 0;
+    this.rot = Math.random() * TAU;
+    this.x = Math.cos(this.rot) * (maxRadius + 200);
+    this.y = Math.sin(this.rot) * (maxRadius + 200);
+    this.rot = this.rot - PI;
+    this.dist = Math.pow(maxRadius + 200, 2);
   };
   Jelly.prototype = {
     tick: function (delta) {
@@ -459,12 +464,19 @@
       this.ani %= TAU;
       this.push = (1 + Math.sin(this.ani*2)) / 2;
 
-      this.x += Math.cos(this.dir) * delta / 10;
-      this.y += Math.sin(this.dir) * delta / 10;
+      var pushit = this.push + 0.4;
+      this.velX = Math.cos(this.rot) * pushit / 20;
+      this.velY = Math.sin(this.rot) * pushit / 20;
+      this.x += this.velX * delta;
+      this.y += this.velY * delta;
+      if (this.x * this.x + this.y * this.y > this.dist &&
+          this.x * this.velX + this.y * this.velY >= 0) { // pointing outside
+        this.remove();
+      }
     },
     render: function (c) {
       c.translate(this.x, this.y);
-      c.rotate(this.rot);
+      c.rotate(this.rot + PI/2);
       for (var i = 0; i < 4; i++) {
         var scale = Math.cos(this.ani + i);
         c.save();
@@ -476,11 +488,11 @@
         c.shadowBlur  = 4;
         c.beginPath();
         c.moveTo(0, 0);
-        c.bezierCurveTo(-10*scale, 20, 20*scale, 40, 0, 50 - 10*this.push);
+        c.bezierCurveTo(-10*scale, 20, 20*scale, 40, 0, 30 + 20*this.push);
         c.stroke();
         c.restore();
       }
-      c.scale(1, 0.5 + this.push/6);
+      c.scale(1 - this.push/10, 0.5 + this.push/6);
       c.drawImage(Jelly.body, -20, -40);
     },
     collide: function (other) {
