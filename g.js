@@ -482,10 +482,7 @@
         this.dist = currentLevel.f(this.angle);
         var d = Math.sqrt(this.x * this.x + this.y * this.y);
         if (Math.abs(d - this.dist) < 1) {
-          addBada(this.angle, 1);
-          badGuyCount++;
-          var p = new Particles(5, this, true, '#6C8DD5');
-          p.add();
+          this.spawn();
           this.spawnTimeout = 1000;
         }
       } else {
@@ -527,6 +524,12 @@
     derezz: function () {
       badGuyCount--;
       newBadGuy();
+    },
+    spawn: function () {
+      var bada = addBada(this.angle, 1);
+      badGuyCount++;
+      var p = new Particles(5, bada, true, true, '#06276F');
+      p.add();
     },
 
     halfWidth: 20,
@@ -731,12 +734,15 @@
   };
   Sprite(Pulse);
 
-  var Particles = function (count, origin, reverse, color) {
+  var Particles = function (count, origin, reverse, follow, color, callback) {
     this.x = origin.x;
     this.y = origin.y;
+    this.origin = origin;
     this.life = 0;
     this.reverse = reverse;
+    this.follow = follow;
     this.color = color || "#FFCF73";
+    this.callback = callback;
     this.particleDirections = [];
     for (var i=0; i < count; i++) {
       var dir = Math.random() * TAU;
@@ -751,6 +757,13 @@
       this.life += delta;
       if (this.life > 500) {
         this.remove();
+        if (this.callback) {
+          this.callback();
+        }
+      }
+      if (this.follow) {
+        this.x = this.origin.x;
+        this.y = this.origin.y;
       }
     },
     render: function (c) {
@@ -1002,16 +1015,18 @@
   }
 
   function addBada(position, length) {
+    var bada;
     var group = {
       dir: (Math.random() > 0.5) ? 1 : -1,
       count: length
     };
     for (var i = 0; i < length; i++) {
-      var bada = new Bada(group);
+      bada = new Bada(group);
       bada.angle = position + i/20;
       bada.ani = i;
       bada.add();
     }
+    return bada;
   }
 
   function findAFreeSpot() {
