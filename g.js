@@ -1300,6 +1300,10 @@
     waitToBegin: function (elapsed) {
       Titles.renderTitle(elapsed) &&
       Titles.renderInstructions(elapsed);
+      
+      if (KEYS.space || KEYS.x) {
+        currentState = states.begin;
+      }
     },
     begin: function () {
       menuNode.style.display = 'none';
