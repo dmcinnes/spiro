@@ -455,11 +455,11 @@
     this.setPosition();
   };
   Jelly.prototype = {
+    range: Math.pow(maxRadius + 200, 2),
     setPosition: function () {
       this.rot = Math.random() * TAU;
       this.x = Math.cos(this.rot) * (maxRadius + 200);
       this.y = Math.sin(this.rot) * (maxRadius + 200);
-      this.dist = Math.pow(maxRadius + 200, 2);
       this.curve = Math.random() < 0.5 ? 1 : -1;
       this.rot = this.rot - PI - this.curve/3;
     },
@@ -475,7 +475,16 @@
       this.velY = Math.sin(this.rot) * pushit / 20;
       this.x += this.velX * delta;
       this.y += this.velY * delta;
-      if (this.x * this.x + this.y * this.y > this.dist &&
+
+      this.angle = Math.atan2(this.y, this.x) - rot;
+      this.dist = currentLevel.f(this.angle);
+      var d = Math.sqrt(this.x * this.x + this.y * this.y);
+      if (Math.abs(d - this.dist) < 1) {
+        addBada(this.angle, 1);
+        badGuyCount++;
+      }
+
+      if (this.x * this.x + this.y * this.y > this.range &&
           this.x * this.velX + this.y * this.velY >= 0) { // pointing outside
         this.setPosition();
       }
