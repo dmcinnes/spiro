@@ -3,12 +3,13 @@
 rm -r pkg
 mkdir pkg
 cp index.html pkg/
+cp s.css pkg/
 echo 'COMPRESSING...'
 yuicompressor -v -o pkg/g.js g.js
 cd pkg
 echo ''
 echo 'ZIPPING...'
-zip -9 game.zip index.html g.js
+zip -9 game.zip index.html g.js s.css
 cd ..
 echo ''
 echo 'SIZE: '
