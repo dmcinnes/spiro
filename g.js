@@ -482,6 +482,8 @@
       if (Math.abs(d - this.dist) < 1) {
         addBada(this.angle, 1);
         badGuyCount++;
+        var p = new Particles(5, this, true, '#06276F');
+        p.add();
       }
 
       if (this.x * this.x + this.y * this.y > this.range &&
@@ -723,10 +725,12 @@
   };
   Sprite(Pulse);
 
-  var Particles = function (count, origin) {
+  var Particles = function (count, origin, reverse, color) {
     this.x = origin.x;
     this.y = origin.y;
     this.life = 0;
+    this.reverse = reverse;
+    this.color = color || "#FFCF73";
     this.particleDirections = [];
     for (var i=0; i < count; i++) {
       var dir = Math.random() * TAU;
@@ -744,13 +748,14 @@
       }
     },
     render: function (c) {
+      var scale = (this.reverse) ? (500 - this.life)/8 : this.life/8;
       var count = this.particleDirections.length;
       c.translate(this.x, this.y);
-      c.fillStyle = "#FFCF73";
+      c.fillStyle = this.color;
       for (var i = 0; i < count; i+=2) {
         var particleX = this.particleDirections[i];
         var particleY = this.particleDirections[i+1];
-        c.fillRect(particleX * this.life/8, particleY * this.life/8,2,2);
+        c.fillRect(particleX * scale, particleY * scale, 2, 2);
       }
     }
   };
