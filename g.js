@@ -452,14 +452,17 @@
 
   var Jelly = function () {
     this.ani = 0;
-    this.rot = Math.random() * TAU;
-    this.x = Math.cos(this.rot) * (maxRadius + 200);
-    this.y = Math.sin(this.rot) * (maxRadius + 200);
-    this.dist = Math.pow(maxRadius + 200, 2);
-    this.curve = Math.random() < 0.5 ? 1 : -1;
-    this.rot = this.rot - PI - this.curve/3;
+    this.setPosition();
   };
   Jelly.prototype = {
+    setPosition: function () {
+      this.rot = Math.random() * TAU;
+      this.x = Math.cos(this.rot) * (maxRadius + 200);
+      this.y = Math.sin(this.rot) * (maxRadius + 200);
+      this.dist = Math.pow(maxRadius + 200, 2);
+      this.curve = Math.random() < 0.5 ? 1 : -1;
+      this.rot = this.rot - PI - this.curve/3;
+    },
     tick: function (delta) {
       this.ani += delta / 500;
       this.ani %= TAU;
@@ -474,7 +477,7 @@
       this.y += this.velY * delta;
       if (this.x * this.x + this.y * this.y > this.dist &&
           this.x * this.velX + this.y * this.velY >= 0) { // pointing outside
-        this.remove();
+        this.setPosition();
       }
     },
     render: function (c) {
