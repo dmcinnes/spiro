@@ -455,14 +455,17 @@
     this.rot = Math.random() * TAU;
     this.x = Math.cos(this.rot) * (maxRadius + 200);
     this.y = Math.sin(this.rot) * (maxRadius + 200);
-    this.rot = this.rot - PI;
     this.dist = Math.pow(maxRadius + 200, 2);
+    this.curve = Math.random() < 0.5 ? 1 : -1;
+    this.rot = this.rot - PI - this.curve/3;
   };
   Jelly.prototype = {
     tick: function (delta) {
       this.ani += delta / 500;
       this.ani %= TAU;
       this.push = (1 + Math.sin(this.ani*2)) / 2;
+
+      this.rot += this.curve * delta / 12000;
 
       var pushit = this.push + 0.4;
       this.velX = Math.cos(this.rot) * pushit / 20;
