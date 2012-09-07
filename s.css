@@ -19,8 +19,9 @@ body{
   z-index:15;
   right:8px;
   top:8px;
-  color: #06276F;
-  font: bold large Impact, Helvetica, sans-serif;
+  color: #4573D5;
+  font: bold 150% Impact, Helvetica, sans-serif;
+  text-shadow: 0 1px 1px #06276F, 0 -1px 1px #06276F;
 }
 #u{
   position:absolute;
