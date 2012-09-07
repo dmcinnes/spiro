@@ -5,7 +5,8 @@
       PULSE  = 4,
       BADA   = 8,
       SEEKER = 16,
-      SPIDER = 32;
+      SPIDER = 32,
+      JELLY  = 64;
 
   var GOOD_GUYS = GUY + BOLT + PULSE;
   var BAD_GUYS  = BADA + SEEKER + SPIDER;
@@ -449,6 +450,74 @@
   };
   Sprite(Spider);
 
+  var Jelly = function () {
+    this.ani = 0;
+  };
+  Jelly.prototype = {
+    tick: function (delta) {
+      this.ani += delta / 500;
+      this.ani %= TAU;
+      this.push = (1 + Math.sin(this.ani*2)) / 2;
+
+      this.x += Math.cos(this.dir) * delta / 10;
+      this.y += Math.sin(this.dir) * delta / 10;
+    },
+    render: function (c) {
+      c.translate(this.x, this.y);
+      c.rotate(this.rot);
+      for (var i = 0; i < 4; i++) {
+        var scale = Math.cos(this.ani + i);
+        c.save();
+        c.translate(-10 + i*7, 0);
+        c.lineWidth = 3;
+        c.lineCap = 'round';
+        c.strokeStyle = '#06276F';
+        c.shadowColor = '#2A4580';
+        c.shadowBlur  = 4;
+        c.beginPath();
+        c.moveTo(0, 0);
+        c.bezierCurveTo(-10*scale, 20, 20*scale, 40, 0, 50 - 10*this.push);
+        c.stroke();
+        c.restore();
+      }
+      c.scale(1, 0.5 + this.push/6);
+      c.drawImage(Jelly.body, -20, -40);
+    },
+    collide: function (other) {
+      plusScore(other.type === GUY ? 250 : 500);
+      this.remove();
+      var p = new Particles(5, this);
+      p.add();
+    },
+    derezz: function () {
+      badGuyCount--;
+      newBadGuy();
+    },
+
+    halfWidth: 20,
+
+    type: JELLY,
+
+    collidesWith: GOOD_GUYS
+  };
+  Sprite(Jelly);
+
+  // create jelly sprites
+  (function () {
+    var body = document.createElement('canvas');
+    Jelly.body = body;
+    body.width=40;
+    body.height=60;
+    var con = body.getContext('2d');
+    con.fillStyle   = '#06276F';
+    con.shadowColor = '#06276F';
+    con.shadowBlur  = 5;
+    con.beginPath();
+    con.arc(20, 20, 15, 0, TAU);
+    con.fillRect(5, 20, 30, 30);
+    con.closePath();
+    con.fill();
+  })();
 
   var Guy = function () {
     this.angle = 0;
@@ -1154,7 +1223,7 @@
       },
       bgcc: 3,
       badaSize: 2,
-      baddies: [Spider, Bada, Bada, Bada, Bada]
+      baddies: [Jelly, Spider, Bada, Bada, Bada, Bada]
     },
 
     {
