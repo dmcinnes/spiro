@@ -1347,8 +1347,6 @@
     }
   ];
 
-  startNewLevel(0);
-
   //////////////
   /// States ///
   //////////////
@@ -1371,6 +1369,7 @@
       instructionsNode.style.display = 'none';
       zz = 0;
       showScore();
+      startNewLevel(0);
       currentState = states.startLevel;
     },
     startLevel: function (elapsed) {
