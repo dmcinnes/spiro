@@ -1405,6 +1405,7 @@
       }
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
+      renderExtraGuys();
     },
     runLevel: function (elapsed) {
       if (badGuyCount === 0 && currentLevelNumber+1 < levels.length) {
@@ -1427,6 +1428,7 @@
         integrateLine();
         renderLine(currentLevel.f,zz,rot);
         runSprites(elapsed);
+        renderExtraGuys();
       } else {
         currentState = states.finishLevel;
       }
@@ -1440,6 +1442,7 @@
       }
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
+      renderExtraGuys();
     },
     guyDie: function (elapsed) {
       if (extraGuys > 0) {
