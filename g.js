@@ -290,15 +290,19 @@
     this.size  = size || 3;
     this.egg   = false;
   };
+  Spider.range = Math.pow(maxRadius + 100, 2);
   Spider.prototype = {
     tick: function (delta) {
       if (this.egg) {
+        if (this.x * this.x + this.y * this.y > Spider.range &&
+            this.x * this.velX + this.y * this.velY >= 0) { // pointing outside
+          // turn em around
+          this.velX = -this.x / Math.abs(this.x);
+          this.velY = -this.y / Math.abs(this.y);
+        }
         this.scale = this.size / 3;
         this.x += this.velX * delta;
         this.y += this.velY * delta;
-        if (this.outside()) {
-          this.remove();
-        }
         this.hatchTime -= delta;
         this.angle = Math.atan2(this.y, this.x) - rot;
         this.dist = currentLevel.f(this.angle);
@@ -460,8 +464,8 @@
     this.spawnTimeout = 0;
     this.setPosition();
   };
+  Jelly.range = Math.pow(maxRadius + 200, 2);
   Jelly.prototype = {
-    range: Math.pow(maxRadius + 200, 2),
     setPosition: function () {
       this.rot = Math.random() * TAU;
       this.x = Math.cos(this.rot) * (maxRadius + 200);
@@ -494,7 +498,7 @@
         this.spawnTimeout -= delta;
       }
 
-      if (this.x * this.x + this.y * this.y > this.range &&
+      if (this.x * this.x + this.y * this.y > Jelly.range &&
           this.x * this.velX + this.y * this.velY >= 0) { // pointing outside
         this.setPosition();
       }
