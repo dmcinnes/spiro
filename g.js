@@ -789,12 +789,13 @@
   ////////////////////////
 
   var KEY_CODES = {
-    88: 'x',
+    13: 'enter',
+    32: 'space',
     37: 'left',
     38: 'up',
     39: 'right',
     40: 'down',
-    32: 'space'
+    88: 'x'
   };
 
   var KEYS = {};
@@ -1359,7 +1360,7 @@
       Titles.renderTitle(elapsed) &&
       Titles.renderInstructions(elapsed);
       
-      if (KEYS.space || KEYS.x) {
+      if (KEYS.space || KEYS.x || KEYS.enter) {
         currentState = states.begin;
       }
     },
