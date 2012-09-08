@@ -59,6 +59,7 @@
       menuNode  = document.getElementById('u'),
       instructionsNode = document.getElementById('i'),
       gameOverNode = document.getElementById('over'),
+      pauseNode = document.getElementById('pause'),
       titleOffset = 0,
       extraGuys = 2,
       GAME_OVER_LENGTH = 6000,
@@ -821,7 +822,7 @@
   window.addEventListener('keydown', function (e) {
     KEYS[KEY_CODES[e.keyCode]] = true;
     keyDown = true;
-    if (e.keyCode === 80) {
+    if (e.keyCode === 80 || e.keyCode === 27) { // P or Esc
       pause();
     }
   }, false);
@@ -906,6 +907,7 @@
     if (running) {
       loop();
     }
+    pauseNode.style.display = running ? 'none' : 'block';
   }
 
   function integrateLine() {
