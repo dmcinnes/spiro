@@ -59,6 +59,7 @@
       menuNode  = document.getElementById('u'),
       instructionsNode = document.getElementById('i'),
       titleOffset = 0,
+      extraGuys = 2,
 
       savedLine,
       savedLineCanvas = document.createElement('canvas');
@@ -593,9 +594,9 @@
 
     collide: function (other) {
       this.flash = 800;
-      // var p = new Particles(10, this);
-      // p.add();
-      // this.remove();
+      var p = new Particles(10, this);
+      p.add();
+      this.remove();
     },
 
     halfWidth: 10,
@@ -660,7 +661,7 @@
       this.remove();
     },
 
-    halfWidth: 14,
+    halfWidth: 20,
 
     type: BOLT,
 
@@ -1264,6 +1265,20 @@
     scoreNode.style.display = 'none';
   }
 
+  function renderExtraGuys() {
+    c.save();
+    c.translate(maxRadius, maxRadius - 30);
+    c.rotate(PI/2);
+    for (var i = 0; i < extraGuys; i++) {
+      c.drawImage(Guy.canvas, 0, 0);
+      c.translate(0, guy.halfWidth * 3);
+    }
+    c.restore();
+  }
+
+  function renderGameOver(delta) {
+  }
+
 
   //////////////
   /// Levels ///
@@ -1333,6 +1348,9 @@
 
   var states = {
     waitToBegin: function (elapsed) {
+      menuNode.style.display = 'block';
+      instructionsNode.style.display = 'block';
+
       Titles.renderTitle(elapsed) &&
       Titles.renderInstructions(elapsed);
       
@@ -1341,6 +1359,7 @@
       }
     },
     begin: function () {
+      extraGuys = 2;
       menuNode.style.display = 'none';
       instructionsNode.style.display = 'none';
       zz = 0;
@@ -1370,6 +1389,7 @@
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
       runSprites(elapsed);
+      renderExtraGuys();
     },
     runOutLevel: function (elapsed) {
       if (levelTimeout > 0) {
@@ -1393,14 +1413,40 @@
       renderLine(currentLevel.f,zz,rot);
     },
     guyDie: function (elapsed) {
-      currentState = states.waitToRestart;
+      if (extraGuys > 0) {
+        levelTimeout = 3000;
+        currentState = states.waitToRestart;
+      } else {
+        levelTimeout = 6000;
+        currentState = states.gameOver;
+      }
     },
     waitToRestart: function (elapsed) {
+      if (levelTimeout > 0) {
+        levelTimeout -= elapsed;
+      } else {
+        extraGuys--;
+        // create new guy
+        guy = new Guy();
+        guy.tick(elapsed);
+        guy.add();
+        currentState = states.runLevel;
+      }
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
       runSprites(elapsed);
+      renderExtraGuys();
     },
-    gameOver: function () {
+    gameOver: function (elapsed) {
+      if (levelTimeout > 0) {
+        levelTimeout -= elapsed;
+      } else {
+        currentState = states.waitToBegin;
+      }
+      integrateLine();
+      renderLine(currentLevel.f,zz,rot);
+      runSprites(elapsed);
+      renderGameOver(elapsed);
     }
   };
   var currentState = states.waitToBegin;
