@@ -58,8 +58,10 @@
       scoreNode = document.getElementById('s'),
       menuNode  = document.getElementById('u'),
       instructionsNode = document.getElementById('i'),
+      gameOverNode = document.getElementById('over'),
       titleOffset = 0,
       extraGuys = 2,
+      GAME_OVER_LENGTH = 6000,
 
       savedLine,
       savedLineCanvas = document.createElement('canvas');
@@ -1277,6 +1279,11 @@
   }
 
   function renderGameOver(delta) {
+    var opacity = GAME_OVER_LENGTH - levelTimeout;
+    if (opacity > 1000) {
+      opacity = 1000;
+    }
+    gameOverNode.style.opacity = opacity / 1000;
   }
 
 
@@ -1417,7 +1424,9 @@
         levelTimeout = 3000;
         currentState = states.waitToRestart;
       } else {
-        levelTimeout = 6000;
+        levelTimeout = GAME_OVER_LENGTH;
+        gameOverNode.style.opacity = 0;
+        gameOverNode.style.display = 'block';
         currentState = states.gameOver;
       }
     },
@@ -1441,6 +1450,7 @@
       if (levelTimeout > 0) {
         levelTimeout -= elapsed;
       } else {
+        gameOverNode.style.display = 'none';
         currentState = states.waitToBegin;
       }
       integrateLine();
