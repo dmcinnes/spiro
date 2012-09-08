@@ -1364,6 +1364,7 @@
       }
     },
     begin: function () {
+      score = 0;
       extraGuys = 2;
       menuNode.style.display = 'none';
       instructionsNode.style.display = 'none';
