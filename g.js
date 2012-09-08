@@ -73,6 +73,7 @@
   c.lineWidth = 2;
 
   var SpritePrototype = {
+    collidable: true,
     prevSprite: null,
     nextSprite: null,
     outside: function () {
@@ -566,7 +567,10 @@
     this.x = 0;
     this.y = 0;
     this.flash = 0;
+    this.newGuyTimeout = Guy.newGuyTimeoutMax;
+    this.collidable = false;
   };
+  Guy.newGuyTimeoutMax = 4000;
   Guy.prototype = {
     tick: function (delta) {
       this.dist = currentLevel.f(this.angle);
@@ -581,9 +585,21 @@
       if (this.flash > 0) {
         this.flash -= delta;
       }
+
+      if (this.newGuyTimeout > 0) {
+        this.newGuyTimeout -= delta;
+        if (this.newGuyTimeout <= 0) {
+          this.collidable = true;
+        }
+      }
     },
 
     render: function (c) {
+      if (!this.collidable) {
+        var diff = this.newGuyTimeout / Guy.newGuyTimeoutMax;
+        c.globalAlpha = (1 + Math.cos(diff * 80 * Math.sin(diff))) / 2;
+      }
+
       c.translate(this.x, this.y);
       c.rotate(rot + this.rot);
       c.drawImage(Guy.canvas, -15, -10);
@@ -843,7 +859,10 @@
       // Compare this sprite's type against
       // the canidate's bitmask.
       // If it's non-zero the sprites can interact
-      if (sprite.alive && sprite.type & canidate.collidesWith) {
+      if (sprite.type & canidate.collidesWith &&
+          sprite.collidable && canidate.collidable &&
+          sprite.alive && canidate.alive) {
+
         var collision = false;
         if (sprite.type === BOLT) {
           collision = checkBoltCollision(sprite, canidate);
