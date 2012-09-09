@@ -733,13 +733,7 @@
     },
     render: function (c) {
       c.translate(this.x, this.y);
-      c.beginPath();
-      c.fillStyle='#FFBE40';
-      c.shadowColor='#FFCF73';
-      c.shadowBlur='30';
-      c.arc(0,0,10,0,TAU);
-      c.closePath();
-      c.fill();
+      c.drawImage(Pulse.canvas, -40, -40);
     },
     derezz: function () {
       var p = new Particles(3, this);
@@ -753,6 +747,22 @@
     collidesWidth: BAD_GUYS
   };
   Sprite(Pulse);
+
+  // create Pulse sprite
+  (function () {
+    var can = document.createElement('canvas');
+    Pulse.canvas = can;
+    can.width  = 80;
+    can.height = 80;
+    var con = can.getContext('2d');
+    con.beginPath();
+    con.fillStyle   = '#FFBE40';
+    con.shadowColor = '#FFCF73';
+    con.shadowBlur  = '30';
+    con.arc(40, 40, 10, 0, TAU);
+    con.closePath();
+    con.fill();
+  })();
 
   var Particles = function (count, origin, reverse, follow, color, callback) {
     this.x = origin.x;
