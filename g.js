@@ -150,6 +150,7 @@
     this.ani = 0;
     this.dist = 0;
     this.scale = 0.1;
+    this.collidible = false;
   };
   Bada.prototype = {
     tick: function (delta) {
@@ -161,6 +162,7 @@
         this.scale += delta / 1000;
       } else if (this.scale > 1) {
         this.scale = 1;
+        this.collidible = true;
       }
 
       this.angle = clamp(this.angle + speed);
@@ -215,6 +217,7 @@
     this.scale = 0;
     this.dir = PI/2;
     this.rot = 0;
+    this.collidible = false;
   };
   Seeker.prototype = {
     tick: function (delta) {
@@ -222,6 +225,7 @@
         this.scale += delta / 1000;
       } else if (this.scale > 1) {
         this.scale = 1;
+        this.collidible = true;
       } else {
         var change = delta / 100;
         var target = Math.atan2(guy.y - this.y, guy.x - this.x);
@@ -289,6 +293,7 @@
     this.dir   = 1;
     this.size  = size || 3;
     this.egg   = false;
+    this.collidible = false;
   };
   Spider.range = Math.pow(maxRadius + 100, 2);
   Spider.prototype = {
@@ -338,6 +343,7 @@
           this.scale += delta / 1000;
         } else if (this.scale > targetScale) {
           this.scale = targetScale;
+          this.collidible = true;
         }
 
         this.angle = clamp(this.angle + this.angleVel * (delta / 1000));
