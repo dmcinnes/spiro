@@ -180,8 +180,6 @@
       c.scale(this.scale, this.scale);
       c.beginPath();
       c.strokeStyle='#06276F';
-      c.shadowBlur = 4;
-      c.shadowColor='#2A4580';
       c.lineWidth = 3/this.scale;
       c.moveTo(-10 + this.ani, 0);
       c.lineTo(0, -8 - this.ani);
@@ -280,8 +278,6 @@
       i+=step;
     }
     con.strokeStyle='#06276F';
-    con.shadowBlur = 5;
-    con.shadowColor='#2A4580';
     con.stroke();
   })();
 
@@ -360,8 +356,6 @@
     render: function (c) {
       c.strokeStyle='#06276F';
       c.fillStyle='#06276F';
-      c.shadowColor='#2A4580';
-      c.shadowBlur = 4;
       c.translate(this.x, this.y);
       c.rotate(rot + this.rot);
       c.scale(this.scale, this.scale);
@@ -519,8 +513,6 @@
         c.lineWidth = 3;
         c.lineCap = 'round';
         c.strokeStyle = '#06276F';
-        c.shadowColor = '#2A4580';
-        c.shadowBlur  = 4;
         c.beginPath();
         c.moveTo(0, 0);
         c.bezierCurveTo(-10*scale, 20, 20*scale, 40, 0, 30 + 20*this.push);
@@ -563,8 +555,6 @@
     body.height=60;
     var con = body.getContext('2d');
     con.fillStyle   = '#06276F';
-    con.shadowColor = '#06276F';
-    con.shadowBlur  = 5;
     con.beginPath();
     con.arc(20, 20, 15, 0, TAU);
     con.fillRect(5, 20, 30, 30);
