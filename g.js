@@ -14,8 +14,8 @@
       UP    = 3,
       DOWN  = 4;
 
-  var GOOD_GUYS = GUY + BOLT + PULSE;
-  var BAD_GUYS  = BADA + SEEKER + SPIDER;
+  var GOOD_GUYS = GUY + BOLT + PULSE,
+      BAD_GUYS  = BADA + SEEKER + SPIDER;
 
   requestAnimFrame = (function () {
     return  window.requestAnimationFrame ||
@@ -324,9 +324,9 @@
         if (d > this.dist) {
           angle += PI;
         }
-        var change = delta / 500;
-        var dir = Math.atan2(this.velY, this.velX);
-        var diff = centerClamp(angle - dir);
+        var change = delta / 500,
+            dir = Math.atan2(this.velY, this.velX),
+            diff = centerClamp(angle - dir);
         dir += (diff < 0) ? -change : change;
         this.velX = Math.cos(dir) * delta / 50;
         this.velY = Math.sin(dir) * delta / 50;
@@ -378,11 +378,11 @@
     },
     renderLeg: function (c, side, face, aniOffset) {
       c.save();
-      var ani = 10 * Math.sin(this.ani + aniOffset);
+      var ani = 10 * Math.sin(this.ani + aniOffset),
       // reach is 20..40
-      var reach = 30 + ani;
-      var dist = 0;
-      var i = this.index;
+          reach = 30 + ani,
+          dist = 0,
+          i = this.index;
       // step through the segments to find one
       // close enough to the current reach
       while (dist < reach) {
@@ -395,20 +395,20 @@
       }
       reach = dist;
       // figure out the point at this segment
-      var rtheta = i * step;
-      var rdist = currentLevel.f(rtheta);
-      var x = Math.cos(rot + rtheta) * rdist;
-      var y = Math.sin(rot + rtheta) * rdist;
-      // calculate the angle between the spider and this
-      // new segment
-      var angle = Math.atan2(y - this.y, x - this.x);
+      var rtheta = i * step,
+          rdist = currentLevel.f(rtheta),
+          x = Math.cos(rot + rtheta) * rdist,
+          y = Math.sin(rot + rtheta) * rdist,
+          // calculate the angle between the spider and this
+          // new segment
+          angle = Math.atan2(y - this.y, x - this.x),
+          halfReach = reach/2,
+          // outer leg is 30
+          knuckle = Math.sqrt(30 * 30 - halfReach * halfReach);
+
       if (face === -1) {
         angle += PI;
       }
-
-      var halfReach = reach/2;
-      // outer leg is 30
-      var knuckle = Math.sqrt(30 * 30 - halfReach * halfReach);
 
       // rotate the leg by the angle we just calculated
       // taking into account the level rotation and the
@@ -426,17 +426,18 @@
     eggDirections: [-PI/4, -3*PI/4, PI/4, 3*PI/4],
     collide: function (other) {
       // smaller eggs worth more
-      var score = this.egg ? 4 - this.size : this.size;
+      var score = this.egg ? 4 - this.size : this.size,
+          size = this.size - 1;
       plusScore((other.type === GUY ? 50 : 100) * score);
 
       this.remove();
-      var size = this.size - 1;
       if (!this.egg && size > 0) {
-        var tan = this.segment.tangent;
-        var dirStart = Math.floor(Math.random() * 4);
+        var tan = this.segment.tangent,
+            dirStart = Math.floor(Math.random() * 4),
+            s, dir;
         for (var i = 0; i < 3; i++) {
-          var s = new Spider(size);
-          var dir = tan + this.eggDirections[(dirStart + i) % 4];
+          s = new Spider(size);
+          dir = tan + this.eggDirections[(dirStart + i) % 4];
           s.egg = true;
           s.hatchTime = 500;
           s.x = this.x;
@@ -539,9 +540,9 @@
       newBadGuy();
     },
     spawn: function () {
-      var bada = addBada(this.angle, 1);
       badGuyCount++;
-      var p = new Particles(5, bada, true, true, '#06276F');
+      var bada = addBada(this.angle, 1),
+          p = new Particles(5, bada, true, true, '#06276F');
       p.add();
     },
 
@@ -641,10 +642,10 @@
 
     fireLaser: function (direction, side) {
       if (Bolt.freeBolts.length) {
-        var bolt = Bolt.freeBolts.pop();
+        var bolt = Bolt.freeBolts.pop(),
+            angle = this.rot + rot;
         bolt.x = this.x;
         bolt.y = this.y;
-        var angle = this.rot + rot;
         if (direction === UP) {
           angle -= PI/2;
         } else {
@@ -843,8 +844,8 @@
       }
     },
     render: function (c) {
-      var scale = (this.reverse) ? (500 - this.life)/8 : this.life/8;
-      var count = this.particleDirections.length;
+      var scale = (this.reverse) ? (500 - this.life)/8 : this.life/8,
+          count = this.particleDirections.length;
       c.translate(this.x, this.y);
       c.fillStyle = this.color;
       for (var i = 0; i < count; i+=2) {
@@ -962,14 +963,13 @@
 
 
   function checkBoltCollision(bolt, sprite) {
-    var boltNormal = bolt.rot;
-    var normX = -bolt.velY;
-    var normY = bolt.velX;
-    var boltNormProj = bolt.x * normX + bolt.y * normY;
-    var spriteNormProj = sprite.x * normX + sprite.y * normY;
-    var dirX = sprite.x - bolt.x;
-    var dirY = sprite.y - bolt.y;
-    var boltProj = dirX * bolt.velX + dirY * bolt.velY;
+    var normX = -bolt.velY,
+        normY = bolt.velX,
+        boltNormProj = bolt.x * normX + bolt.y * normY,
+        spriteNormProj = sprite.x * normX + sprite.y * normY,
+        dirX = sprite.x - bolt.x,
+        dirY = sprite.y - bolt.y,
+        boltProj = dirX * bolt.velX + dirY * bolt.velY;
     return Math.abs(boltNormProj - spriteNormProj) < bolt.halfWidth + sprite.halfWidth &&
            Math.abs(boltProj) < Bolt.size;
   }
@@ -1016,9 +1016,9 @@
   }
 
   function integrateLine() {
-    var index = segmentIndex(rot);
-    var segmentLength = (currentLevel.segments) ? currentLevel.segments[index].length : 1;
-    var currentMaxVel = 4 * maxRot/segmentLength;
+    var index = segmentIndex(rot),
+        segmentLength = (currentLevel.segments) ? currentLevel.segments[index].length : 1,
+        currentMaxVel = 4 * maxRot/segmentLength;
     rotVel += rotAcc;
     if (Math.abs(rotVel) > currentMaxVel) {
       rotVel = currentMaxVel * Math.abs(rotVel)/rotVel;
@@ -1034,17 +1034,17 @@
     if (level.segments) {
       return; // already calculated
     }
-    var segments = [];
-    var f = level.f;
-    var z = zzTarget;
-    var length;
-    var position = 0;
-    var i=0;
-    var w = f(0,z);
-    var x1 = Math.cos(0)*w;
-    var y1 = Math.sin(0)*w;
-    var angle=step;
-    var x2, y2, x, y;
+    var segments = [],
+        f = level.f,
+        z = zzTarget,
+        length,
+        position = 0,
+        i=0,
+        w = f(0,z),
+        x1 = Math.cos(0)*w,
+        y1 = Math.sin(0)*w,
+        angle=step,
+        x2, y2, x, y;
     while (angle <= TAU) {
       w = f(angle,z);
       x2 = Math.cos(angle)*w;
@@ -1130,11 +1130,6 @@
     return t;
   }
 
-  // get precalculated tangent
-  function tangentAngle(theta) {
-    return segmentForAngle(theta).tangent;
-  }
-
   function segmentForAngle(theta) {
     var i = segmentIndex(theta);
     return currentLevel.segments[i];
@@ -1160,10 +1155,10 @@
   }
 
   function findAFreeSpot() {
-    var bucketCount = 20;
-    var bucketLength = Math.round(currentLevel.totalLength / bucketCount);
-    var buckets = [];
-    var sprite = headSprite;
+    var bucketCount = 20,
+        bucketLength = Math.round(currentLevel.totalLength / bucketCount),
+        buckets = [],
+        sprite = headSprite;
     while (sprite) {
       if (sprite.angle !== undefined) {
         var pos = currentLevel.segments[segmentIndex(sprite.angle)].position;
@@ -1393,9 +1388,6 @@
     scoreNode.innerHTML = score;
     scoreNode.style.display = 'block';
   }
-  function hideScore() {
-    scoreNode.style.display = 'none';
-  }
 
   function renderExtraGuys() {
     c.save();
@@ -1600,8 +1592,8 @@
   /////////////////
 
   function loop() {
-    var thisFrame = timestamp();
-    var elapsed = thisFrame - lastFrame;
+    var thisFrame = timestamp(),
+        elapsed = thisFrame - lastFrame;
     lastFrame = thisFrame;
 
     if (elapsed > 100) {
