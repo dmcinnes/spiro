@@ -576,6 +576,7 @@
     this.flash = 0;
     this.newGuyTimeout = Guy.newGuyTimeoutMax;
     this.collidable = false;
+    this.upgrades = {};
   };
   Guy.newGuyTimeoutMax = 4000;
   Guy.prototype = {
@@ -627,7 +628,7 @@
     },
 
     fire: function () {
-      if (this.double) {
+      if (this.upgrades.double) {
         guy.fireLaser(UP,   LEFT);
         guy.fireLaser(UP,   RIGHT);
         guy.fireLaser(DOWN, LEFT);
@@ -883,7 +884,7 @@
     },
     collide: function (other) {
       this.remove();
-      other.double = true;
+      guy.upgrades.double = true;
       badGuyCount--;
     },
     derezz: function () {
@@ -1357,8 +1358,12 @@
       sprite = tailSprite;
     }
 
+    var upgrades = guy && guy.upgrades;
     // create new guy
     guy = new Guy();
+    if (upgrades) {
+      guy.upgrades = upgrades;
+    }
     guy.add();
 
     // queue up next level
