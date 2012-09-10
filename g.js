@@ -6,7 +6,13 @@
       BADA   = 8,
       SEEKER = 16,
       SPIDER = 32,
-      JELLY  = 64;
+      JELLY  = 64,
+      PICKUP = 128;
+
+  var LEFT  = 1,
+      RIGHT = 2,
+      UP    = 3,
+      DOWN  = 4;
 
   var GOOD_GUYS = GUY + BOLT + PULSE;
   var BAD_GUYS  = BADA + SEEKER + SPIDER;
@@ -612,17 +618,56 @@
     },
 
     collide: function (other) {
-      this.flash = 800;
-      var p = new Particles(10, this);
-      p.add();
-      this.remove();
+      if (other.type & BAD_GUYS) {
+        this.flash = 800;
+        var p = new Particles(10, this);
+        p.add();
+        this.remove();
+      }
+    },
+
+    fire: function () {
+      if (this.double) {
+        guy.fireLaser(UP,   LEFT);
+        guy.fireLaser(UP,   RIGHT);
+        guy.fireLaser(DOWN, LEFT);
+        guy.fireLaser(DOWN, RIGHT);
+      } else {
+        guy.fireLaser(UP);
+        guy.fireLaser(DOWN);
+      }
+    },
+
+    fireLaser: function (direction, side) {
+      if (Bolt.freeBolts.length) {
+        var bolt = Bolt.freeBolts.pop();
+        bolt.x = this.x;
+        bolt.y = this.y;
+        var angle = this.rot + rot;
+        if (direction === UP) {
+          angle -= PI/2;
+        } else {
+          angle -= 3*PI/2;
+        }
+        if (side === LEFT) {
+          bolt.x += Math.sin(angle) * 10;
+          bolt.y -= Math.cos(angle) * 10;
+        } else if (side === RIGHT) {
+          bolt.x -= Math.sin(angle) * 10;
+          bolt.y += Math.cos(angle) * 10;
+        }
+        bolt.rot = this.rot + rot;
+        bolt.velX = Math.cos(angle) * 3;
+        bolt.velY = Math.sin(angle) * 3;
+        bolt.add();
+      }
     },
 
     halfWidth: 10,
 
     type: GUY,
 
-    collidesWith: BAD_GUYS
+    collidesWith: BAD_GUYS + PICKUP
   };
   Sprite(Guy);
 
@@ -810,6 +855,73 @@
   };
   Sprite(Particles);
 
+  var Pickup = function () {
+    this.angle   = Math.floor(Math.random() * TAU);
+    this.segment = segmentForAngle(this.angle);
+    this.life    = Pickup.maxLife;
+  };
+  Pickup.maxLife = 12000;
+  Pickup.prototype = {
+    tick: function (delta) {
+      this.dist = currentLevel.f(this.angle);
+      this.updateSpriteCartesian();
+      this.life -= delta;
+      if (this.life < 0) {
+        this.remove();
+      }
+    },
+    render: function (c) {
+      c.translate(this.x, this.y);
+      var percent = this.life / Pickup.maxLife;
+      var scale = (3 + Math.sin(TAU * percent * 10)) / 2;
+      if (percent < 0.25) {
+        c.globalAlpha = (1 + Math.cos(TAU * percent * 30)) / 2;
+      }
+      c.scale(scale, scale);
+      c.drawImage(Pickup.canvas, -40, -40);
+      c.drawImage(Pickup.doubleBolt, -40, -40);
+    },
+    collide: function (other) {
+      this.remove();
+      other.double = true;
+      badGuyCount--;
+    },
+    derezz: function () {
+    },
+
+    halfWidth: 5,
+
+    type: PICKUP,
+
+    collidesWidth: GUY
+  };
+  Sprite(Pickup);
+
+  // create Pickup sprite
+  (function () {
+    var can = document.createElement('canvas');
+    Pickup.canvas = can;
+    can.width  = 80;
+    can.height = 80;
+    var con = can.getContext('2d');
+    con.beginPath();
+    con.fillStyle   = '#FFBE40';
+    con.shadowColor = '#FFCF73';
+    con.shadowBlur  = '30';
+    con.arc(40, 40, 10, 0, TAU);
+    con.closePath();
+    con.fill();
+
+    can = document.createElement('canvas');
+    Pickup.doubleBolt = can;
+    can.width  = 80;
+    can.height = 80;
+    con = can.getContext('2d');
+    con.scale(0.6, 0.4);
+    con.drawImage(Bolt.canvas, 56.5, 80, 10, 40);
+    con.drawImage(Bolt.canvas, 66.5, 80, 10, 40);
+  })();
+
 
   ////////////////////////
   //// Input Handling ////
@@ -891,24 +1003,6 @@
         }
       }
       sprite = sprite.nextSprite;
-    }
-  }
-
-  function fire(direction) {
-    if (Bolt.freeBolts.length) {
-      var bolt = Bolt.freeBolts.pop();
-      bolt.x = guy.x;
-      bolt.y = guy.y;
-      var angle = guy.rot + rot;
-      if (direction === 'up') {
-        angle -= PI/2;
-      } else {
-        angle -= 3*PI/2;
-      }
-      bolt.rot = guy.rot + rot;
-      bolt.velX = Math.cos(angle) * 3;
-      bolt.velY = Math.sin(angle) * 3;
-      bolt.add();
     }
   }
 
@@ -1203,8 +1297,7 @@
       Bolt.currentBoltFireTimeout -= elapsed;
       if (Bolt.currentBoltFireTimeout < 0) {
         Bolt.currentBoltFireTimeout = Bolt.BOLT_FIRE_TIMEOUT;
-        fire('up');
-        fire('down');
+        guy.fire();
       }
     }
   }
@@ -1330,7 +1423,7 @@
       },
       bgcc: 3,
       badaSize: 2,
-      baddies: [Jelly, Spider, Bada, Bada, Bada, Bada]
+      baddies: [Pickup, Jelly, Spider, Bada, Bada, Bada, Bada]
     },
 
     {
