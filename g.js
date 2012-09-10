@@ -628,7 +628,7 @@
     },
 
     fire: function () {
-      if (this.upgrades.double) {
+      if (this.upgrades.doubleGuns) {
         guy.fireLaser(UP,   LEFT);
         guy.fireLaser(UP,   RIGHT);
         guy.fireLaser(DOWN, LEFT);
@@ -880,11 +880,11 @@
       }
       c.scale(scale, scale);
       c.drawImage(Pickup.canvas, -40, -40);
-      c.drawImage(Pickup.doubleBolt, -40, -40);
+      c.drawImage(Pickup.doubleGunsBolt, -40, -40);
     },
     collide: function (other) {
       this.remove();
-      guy.upgrades.double = true;
+      guy.upgrades.doubleGuns = true;
       badGuyCount--;
     },
     derezz: function () {
@@ -914,7 +914,7 @@
     con.fill();
 
     can = document.createElement('canvas');
-    Pickup.doubleBolt = can;
+    Pickup.doubleGunsBolt = can;
     can.width  = 80;
     can.height = 80;
     con = can.getContext('2d');
