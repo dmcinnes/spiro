@@ -36,6 +36,39 @@
     timestamp = Date.now;
   }
 
+
+  ////////////////
+  /// Sound FX ///
+  ////////////////
+
+  var synth = new SfxrSynth();
+
+  var sounds = {
+    shoot: "1,,0.14,,0.25,0.9927,0.6662,-0.2093,,,,,,0.715,-0.5504,,,,1,,,0.2751,,0.5"
+  };
+
+  var play = function () {
+    this[++this.current % this.length].play();
+  };
+
+  for (var s in sounds) {
+    var src = synth.getWave(sounds[s]);
+    var group = [];
+    group.current = 0;
+    group.play = play;
+    for (var i = 0; i < 3; i++) {
+      var player = new Audio();
+      player.src = src;
+      group[i] = player;
+    }
+    sounds[s] = group;
+  }
+
+
+  /////////////////
+  /// Variables ///
+  /////////////////
+
   var PI  = Math.PI,
       TAU = 2*PI, // http://tauday.com/
       gameWidth = 600,
@@ -77,6 +110,11 @@
 
   c.translate(305, 305);
   c.lineWidth = 2;
+
+
+  ///////////////
+  /// Sprites ///
+  ///////////////
 
   var SpritePrototype = {
     collidable: true,
@@ -145,10 +183,6 @@
       }
     }
   };
-
-  /////////////////
-  //// SPRITES ////
-  /////////////////
 
   var Bada = function (group) {
     this.group = group;
@@ -670,6 +704,9 @@
     },
 
     fire: function () {
+      if (Bolt.freeBolts.length) {
+        sounds.shoot.play();
+      }
       if (this.upgrades.doubleGuns) {
         guy.fireLaser(UP,   LEFT);
         guy.fireLaser(UP,   RIGHT);
