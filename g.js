@@ -6,8 +6,7 @@
       BADA   = 8,
       SEEKER = 16,
       SPIDER = 32,
-      JELLY  = 64,
-      PICKUP = 128;
+      JELLY  = 64;
 
   var LEFT  = 1,
       RIGHT = 2,
@@ -669,7 +668,7 @@
 
     type: GUY,
 
-    collidesWith: BAD_GUYS + PICKUP
+    collidesWith: BAD_GUYS
   };
   Sprite(Guy);
 
@@ -870,6 +869,8 @@
       this.life -= delta;
       if (this.life < 0) {
         this.remove();
+      } else if (guy.alive && this.distance(guy) < this.halfWidth + guy.halfWidth) {
+        this.collide();
       }
     },
     render: function (c) {
@@ -891,11 +892,7 @@
     derezz: function () {
     },
 
-    halfWidth: 5,
-
-    type: PICKUP,
-
-    collidesWidth: GUY
+    halfWidth: 5
   };
   Sprite(Pickup);
 
