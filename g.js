@@ -155,7 +155,7 @@
     this.ani = 0;
     this.dist = 0;
     this.scale = 0.1;
-    this.collidible = false;
+    this.collidable = false;
   };
   Bada.prototype = {
     tick: function (delta) {
@@ -167,7 +167,7 @@
         this.scale += delta / 1000;
       } else if (this.scale > 1) {
         this.scale = 1;
-        this.collidible = true;
+        this.collidable = true;
       }
 
       this.angle = clamp(this.angle + speed);
@@ -220,7 +220,7 @@
     this.scale = 0;
     this.dir = PI/2;
     this.rot = 0;
-    this.collidible = false;
+    this.collidable = false;
   };
   Seeker.prototype = {
     tick: function (delta) {
@@ -228,7 +228,7 @@
         this.scale += delta / 1000;
       } else if (this.scale > 1) {
         this.scale = 1;
-        this.collidible = true;
+        this.collidable = true;
       } else {
         var change = delta / 100;
         var target = Math.atan2(guy.y - this.y, guy.x - this.x);
@@ -294,7 +294,7 @@
     this.dir   = 1;
     this.size  = size || 3;
     this.egg   = false;
-    this.collidible = false;
+    this.collidable = false;
   };
   Spider.range = Math.pow(maxRadius + 100, 2);
   Spider.prototype = {
@@ -344,7 +344,7 @@
           this.scale += delta / 1000;
         } else if (this.scale > targetScale) {
           this.scale = targetScale;
-          this.collidible = true;
+          this.collidable = true;
         }
 
         this.angle = clamp(this.angle + this.angleVel * (delta / 1000));
@@ -577,6 +577,7 @@
     this.newGuyTimeout = Guy.newGuyTimeoutMax;
     this.collidable = false;
     this.upgrades = {};
+    this.hitTimeout = 0;
   };
   Guy.newGuyTimeoutMax = 4000;
   Guy.prototype = {
@@ -597,6 +598,13 @@
       if (this.newGuyTimeout > 0) {
         this.newGuyTimeout -= delta;
         if (this.newGuyTimeout <= 0) {
+          this.collidable = true;
+        }
+      }
+
+      if (this.hitTimeout > 0) {
+        this.hitTimeout -= delta;
+        if (this.hitTimeout <= 0) {
           this.collidable = true;
         }
       }
@@ -650,6 +658,8 @@
             p = new Particles(5, this);
             p.add();
           }
+          this.hitTimeout = 300;
+          this.collidable = false;
         } else {
           this.flash = 800;
           p = new Particles(10, this);
