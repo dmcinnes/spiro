@@ -611,7 +611,28 @@
       c.translate(this.x, this.y);
       c.rotate(rot + this.rot);
       c.drawImage(Guy.canvas, -15, -10);
-      if (this.flash > 0) {
+
+      if (this.upgrades.shield &&
+          this.upgrades.shieldStrength > 0) {
+        var width = this.upgrades.shieldStrength + 2;
+        c.globalAlpha = this.upgrades.shieldStrength / 3;
+        c.save();
+        c.beginPath();
+        c.arc(0, 0, 20, 0, TAU);
+        c.lineWidth = width;
+        c.strokeStyle='#A66E00';
+        c.stroke();
+        c.lineWidth = 1;
+        c.strokeStyle='#FFBE40';
+        c.stroke();
+        if (this.flash > 0) {
+          c.lineWidth = width;
+          c.globalCompositeOperation = 'lighter';
+          c.globalAlpha = this.flash / 800;
+          c.stroke();
+        }
+        c.restore();
+      } else if (this.flash > 0) {
         c.globalCompositeOperation = 'lighter';
         c.globalAlpha = this.flash / 800;
         c.drawImage(Guy.canvas, -15, -10);
@@ -619,11 +640,22 @@
     },
 
     collide: function (other) {
+      var p;
       if (other.type & BAD_GUYS) {
-        this.flash = 800;
-        var p = new Particles(10, this);
-        p.add();
-        this.remove();
+        if (this.upgrades.shieldStrength > 0) {
+          this.upgrades.shieldStrength--;
+          if (this.upgrades.shieldStrength > 0) {
+            this.flash = 800;
+          } else {
+            p = new Particles(5, this);
+            p.add();
+          }
+        } else {
+          this.flash = 800;
+          p = new Particles(10, this);
+          p.add();
+          this.remove();
+        }
       }
     },
 
@@ -675,9 +707,10 @@
   // create guy sprite
   (function () {
     var path = [-15, 0, -10, -8, -5, -8, -2, -10, -2, -8, 2, -8, 2, -10, 5, -8, 10, -8, 15, 0, 10, 8, 5, 8, 2, 10, 2, 8, -2, 8, -2, 10, -5, 8, -10, 8, -15, 0];
-    Guy.canvas = document.createElement('canvas');
-    Guy.canvas.width=30;
-    Guy.canvas.height=20;
+    var can = document.createElement('canvas');
+    can.width=30;
+    can.height=20;
+    Guy.canvas = can;
     var con = Guy.canvas.getContext('2d');
     con.translate(15,10);
     con.beginPath();
@@ -860,6 +893,7 @@
     this.angle   = Math.floor(Math.random() * TAU);
     this.segment = segmentForAngle(this.angle);
     this.life    = Pickup.maxLife;
+    this.flavor  = Math.random() < 0.5 ? 'shield' : 'doubleGuns';
   };
   Pickup.maxLife = 12000;
   Pickup.prototype = {
@@ -882,14 +916,17 @@
       }
       c.scale(scale, scale);
       c.drawImage(Pickup.canvas, -40, -40);
-      c.drawImage(Pickup.doubleGunsBolt, -40, -40);
+      c.drawImage(Pickup[this.flavor], -40, -40);
     },
     collide: function (other) {
       this.remove();
-      guy.upgrades.doubleGuns = true;
-      badGuyCount--;
+      guy.upgrades[this.flavor] = true;
+      if (this.flavor === 'shield') {
+        guy.upgrades.shieldStrength = 3;
+      }
     },
     derezz: function () {
+      badGuyCount--;
     },
 
     halfWidth: 5
@@ -908,17 +945,28 @@
     con.shadowColor = '#FFCF73';
     con.shadowBlur  = '30';
     con.arc(40, 40, 10, 0, TAU);
-    con.closePath();
     con.fill();
 
     can = document.createElement('canvas');
-    Pickup.doubleGunsBolt = can;
+    Pickup.doubleGuns = can;
     can.width  = 80;
     can.height = 80;
     con = can.getContext('2d');
     con.scale(0.6, 0.4);
     con.drawImage(Bolt.canvas, 56.5, 80, 10, 40);
     con.drawImage(Bolt.canvas, 66.5, 80, 10, 40);
+
+    can = document.createElement('canvas');
+    Pickup.shield = can;
+    can.width  = 80;
+    can.height = 80;
+    con = can.getContext('2d');
+    con.beginPath();
+    con.arc(40, 40, 6, 0, TAU);
+    con.shadowBlur='10';
+    con.shadowColor='#06276F';
+    con.strokeStyle='#06276F';
+    con.stroke();
   })();
 
 
