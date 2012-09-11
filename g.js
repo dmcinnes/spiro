@@ -1475,7 +1475,7 @@
       },
       bgcc: 3,
       badaSize: 2,
-      baddies: [Pickup, Jelly, Spider, Bada, Bada, Bada, Bada]
+      baddies: [Jelly, Spider, Bada, Pickup, Bada, Bada, Bada]
     },
 
     {
@@ -1484,7 +1484,7 @@
       },
       bgcc: 3,
       badaSize: 3,
-      baddies: [Jelly, Spider, Bada, Bada, Bada, Bada, Seeker]
+      baddies: [Jelly, Spider, Bada, Bada, Pickup, Bada, Bada, Seeker]
     },
 
     {
@@ -1493,7 +1493,7 @@
       },
       bgcc: 4,
       badaSize: 4,
-      baddies: [Jelly, Spider, Bada, Bada, Bada, Bada, Seeker]
+      baddies: [Jelly, Spider, Bada, Bada, Bada, Pickup, Bada, Seeker]
     },
 
     {
@@ -1502,7 +1502,7 @@
       },
       bgcc: 4,
       badaSize: 4,
-      baddies: [Jelly, Spider, Bada, Bada, Bada, Bada, Seeker, Bada, Seeker]
+      baddies: [Jelly, Spider, Bada, Pickup, Bada, Bada, Bada, Seeker, Bada, Seeker]
     },
 
     {
@@ -1511,7 +1511,7 @@
       },
       bgcc: 4,
       badaSize: 3,
-      baddies: [Jelly, Spider, Bada, Bada, Bada, Bada, Seeker]
+      baddies: [Jelly, Spider, Bada, Bada, Pickup, Bada, Bada, Seeker]
     },
 
     {
