@@ -164,7 +164,7 @@
       var speed = this.group.dir * delta / 10000;
 
       if (this.scale < 1) {
-        this.scale += delta / 1000;
+        this.scale += delta / 2000;
       } else if (this.scale > 1) {
         this.scale = 1;
         this.collidable = true;
