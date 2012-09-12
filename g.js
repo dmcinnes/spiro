@@ -1583,6 +1583,7 @@
       menuNode.style.display = 'none';
       instructionsNode.style.display = 'none';
       zz = 0;
+      guy = null;
       showScore();
       startNewLevel(0);
       currentState = states.startLevel;
