@@ -16,6 +16,8 @@
   var GOOD_GUYS = GUY + BOLT + PULSE,
       BAD_GUYS  = BADA + SEEKER + SPIDER;
 
+  window.scrollTo(0,1);
+
   requestAnimFrame = (function () {
     return  window.requestAnimationFrame ||
       window.webkitRequestAnimationFrame ||
@@ -61,17 +63,28 @@
     this[++this.current % this.length].play();
   };
 
-  for (var s in sfx) {
-    var src = synth.getWave(sfx[s]);
-    var group = [];
-    group.current = 0;
-    group.play = play;
-    for (var i = 0; i < 3; i++) {
-      var player = new Audio();
-      player.src = src;
-      group[i] = player;
+  var s;
+  try {
+    for (s in sfx) {
+      var src = synth.getWave(sfx[s]);
+      var group = [];
+      group.current = 0;
+      group.play = play;
+      for (var i = 0; i < 3; i++) {
+        var player = new Audio();
+        player.src = src;
+        group[i] = player;
+      }
+      sfx[s] = group;
     }
-    sfx[s] = group;
+  } catch(e) {
+    // probably on mobile
+    var b = function () {};
+    for (s in sfx) {
+      sfx[s] = {
+        play: b
+      };
+    }
   }
 
 
