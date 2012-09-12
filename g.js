@@ -291,11 +291,8 @@
       c.translate(this.x, this.y);
       c.scale(this.scale, this.scale);
       c.rotate(this.rot);
+      c.globalAlpha = this.scale;
       c.drawImage(Seeker.canvas, -25, -25);
-      if (this.scale < 1) {
-        c.globalCompositeOperation = 'lighter';
-        c.drawImage(Seeker.canvas, -25, -25);
-      }
     },
     collide: function (other) {
       sfx.splode2.play();
