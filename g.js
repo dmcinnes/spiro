@@ -269,7 +269,7 @@
   Seeker.prototype = {
     tick: function (delta) {
       if (this.scale < 1) {
-        this.scale += delta / 1000;
+        this.scale += delta / 1500;
       } else if (this.scale > 1) {
         this.scale = 1;
         this.collidable = true;
@@ -287,9 +287,13 @@
     },
     render: function (c) {
       c.translate(this.x, this.y);
-      c.scale(this.scale,this.scale);
+      c.scale(this.scale, this.scale);
       c.rotate(this.rot);
       c.drawImage(Seeker.canvas, -25, -25);
+      if (this.scale < 1) {
+        c.globalCompositeOperation = 'lighter';
+        c.drawImage(Seeker.canvas, -25, -25);
+      }
     },
     collide: function (other) {
       sfx.splode2.play();
