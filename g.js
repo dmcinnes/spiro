@@ -665,10 +665,12 @@
     },
 
     render: function (c) {
+      var blink = 1;
       if (!this.collidable) {
         var diff = this.newGuyTimeout / Guy.newGuyTimeoutMax;
-        c.globalAlpha = (1 + Math.cos(diff * 80 * Math.sin(diff))) / 2;
+        blink = (1 + Math.cos(diff * 80 * Math.sin(diff))) / 2;
       }
+      c.globalAlpha = blink;
 
       c.translate(this.x, this.y);
       c.rotate(rot + this.rot);
@@ -677,7 +679,7 @@
       if (this.upgrades.shield &&
           this.upgrades.shieldStrength > 0) {
         var width = this.upgrades.shieldStrength + 2;
-        c.globalAlpha = this.upgrades.shieldStrength / 3;
+        c.globalAlpha = (blink < 1) ? blink : this.upgrades.shieldStrength / 3;
         c.save();
         c.beginPath();
         c.arc(0, 0, 20, 0, TAU);
