@@ -203,7 +203,7 @@
       var speed = this.group.dir * delta / 10000;
 
       if (this.scale < 1) {
-        this.scale += delta / 2000;
+        this.scale += delta / 3000;
       } else if (this.scale > 1) {
         this.scale = 1;
         this.collidable = true;
@@ -223,7 +223,7 @@
       c.rotate(rot + this.rot);
       c.scale(this.scale, this.scale);
       c.beginPath();
-      c.strokeStyle='#06276F';
+      c.strokeStyle = (this.scale < 1) ? '#2A4580' : '#06276F';
       c.lineWidth = 3/this.scale;
       c.moveTo(-10 + this.ani, 0);
       c.lineTo(0, -8 - this.ani);
