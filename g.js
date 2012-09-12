@@ -1534,6 +1534,15 @@
     scoreNode.style.display = 'block';
   }
 
+  function renderCanvasHudElements() {
+    if (extraGuys > 0) {
+      renderExtraGuys();
+    }
+    if (pulseCount > 0) {
+      renderPulse();
+    }
+  }
+
   function renderExtraGuys() {
     c.save();
     c.translate(maxRadius, maxRadius - 30);
@@ -1542,6 +1551,14 @@
       c.drawImage(Guy.canvas, 0, 0);
       c.translate(0, guy.halfWidth * 3);
     }
+    c.restore();
+  }
+
+  function renderPulse() {
+    c.save();
+    c.translate(-20 - maxRadius , maxRadius - 60);
+    c.drawImage(Pulse.canvas, 0, 0);
+    c.drawImage(Pulse.canvas, 10, 0);
     c.restore();
   }
 
@@ -1651,7 +1668,7 @@
       }
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
-      renderExtraGuys();
+      renderCanvasHudElements();
     },
     runLevel: function (elapsed) {
       if (badGuyCount === 0 && currentLevelNumber+1 < levels.length) {
@@ -1665,7 +1682,7 @@
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
       runSprites(elapsed);
-      renderExtraGuys();
+      renderCanvasHudElements();
     },
     runOutLevel: function (elapsed) {
       if (levelTimeout > 0) {
@@ -1674,7 +1691,7 @@
         integrateLine();
         renderLine(currentLevel.f,zz,rot);
         runSprites(elapsed);
-        renderExtraGuys();
+        renderCanvasHudElements();
       } else {
         currentState = states.finishLevel;
         sfx.levelOut.play();
@@ -1689,7 +1706,7 @@
       }
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
-      renderExtraGuys();
+      renderCanvasHudElements();
     },
     guyDie: function (elapsed) {
       if (extraGuys > 0) {
@@ -1716,7 +1733,7 @@
       integrateLine();
       renderLine(currentLevel.f,zz,rot);
       runSprites(elapsed);
-      renderExtraGuys();
+      renderCanvasHudElements();
     },
     gameOver: function (elapsed) {
       if (levelTimeout > 0) {
