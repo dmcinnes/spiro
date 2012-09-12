@@ -43,17 +43,19 @@
 
   var synth = new SfxrSynth();
 
-  var sounds = {
-    shoot: "1,,0.14,,0.25,0.9927,0.6662,-0.2093,,,,,,0.715,-0.5504,,,,1,,,0.2751,,0.5",
-    pickup: "1,,0.0454,,0.4952,0.35,,0.1773,,,,,,,,,,,1,,,,,0.5"
+  var sfx = {
+    shoot:   "1,,0.14,,0.25,0.9927,0.6662,-0.2093,,,,,,0.715,-0.5504,,,,1,,,0.2751,,0.5",
+    pickup:  "1,,0.0454,,0.4952,0.35,,0.1773,,,,,,,,,,,1,,,,,0.5",
+    splode1: "3,,0.2792,0.2599,0.28,0.0464,,0.26,,,,,,,,,0.4555,-0.055,1,,,,,0.5",
+    splode2: "1,,0.1926,,0.066,0.6888,0.0064,-0.36,,,,,,0.3733,0.0696,,,,1,,,,,0.5"
   };
 
   var play = function () {
     this[++this.current % this.length].play();
   };
 
-  for (var s in sounds) {
-    var src = synth.getWave(sounds[s]);
+  for (var s in sfx) {
+    var src = synth.getWave(sfx[s]);
     var group = [];
     group.current = 0;
     group.play = play;
@@ -62,7 +64,7 @@
       player.src = src;
       group[i] = player;
     }
-    sounds[s] = group;
+    sfx[s] = group;
   }
 
 
@@ -229,6 +231,7 @@
       c.stroke();
     },
     collide: function (other) {
+      sfx.splode2.play();
       plusScore(other.type === GUY ? 25 : 50);
       this.remove();
       var p = new Particles(5, this);
@@ -283,6 +286,7 @@
       c.drawImage(Seeker.canvas, -25, -25);
     },
     collide: function (other) {
+      sfx.splode2.play();
       plusScore(other.type === GUY ? 250 : 500);
       this.remove();
       var p = new Particles(5, this);
@@ -459,6 +463,7 @@
     },
     eggDirections: [-PI/4, -3*PI/4, PI/4, 3*PI/4],
     collide: function (other) {
+      sfx.splode2.play();
       // smaller eggs worth more
       var score = this.egg ? 4 - this.size : this.size,
           size = this.size - 1;
@@ -564,6 +569,7 @@
       c.drawImage(Jelly.body, -20, -40);
     },
     collide: function (other) {
+      sfx.splode2.play();
       plusScore(other.type === GUY ? 250 : 500);
       this.remove();
       var p = new Particles(5, this);
@@ -696,6 +702,7 @@
           this.hitTimeout = 300;
           this.collidable = false;
         } else {
+          sfx.splode1.play();
           this.flash = 800;
           p = new Particles(10, this);
           p.add();
@@ -706,7 +713,7 @@
 
     fire: function () {
       if (Bolt.freeBolts.length) {
-        sounds.shoot.play();
+        sfx.shoot.play();
       }
       if (this.upgrades.doubleGuns) {
         guy.fireLaser(UP,   LEFT);
@@ -967,7 +974,7 @@
       c.drawImage(Pickup[this.flavor], -40, -40);
     },
     collide: function (other) {
-      sounds.pickup.play();
+      sfx.pickup.play();
       this.remove();
       guy.upgrades[this.flavor] = true;
       if (this.flavor === 'shield') {
