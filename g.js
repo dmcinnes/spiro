@@ -1150,11 +1150,13 @@
   }
 
   function pause() {
-    running = !running;
-    if (running) {
-      loop();
+    if (currentState !== states.waitToBegin) {
+      running = !running;
+      if (running) {
+        loop();
+      }
+      pauseNode.style.display = running ? 'none' : 'block';
     }
-    pauseNode.style.display = running ? 'none' : 'block';
   }
 
   function integrateLine() {
