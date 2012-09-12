@@ -662,6 +662,13 @@
           this.collidable = true;
         }
       }
+
+      if (this.newShieldTimeout > 0) {
+        this.newShieldTimeout -= delta;
+        if (this.newShieldTimeout < 0) {
+          this.newShieldTimeout = 0;
+        }
+      }
     },
 
     render: function (c) {
@@ -679,8 +686,17 @@
       if (this.upgrades.shield &&
           this.upgrades.shieldStrength > 0) {
         var width = this.upgrades.shieldStrength + 2;
-        c.globalAlpha = (blink < 1) ? blink : this.upgrades.shieldStrength / 3;
+        var scale = 1 + this.newShieldTimeout / 300;
+        if (blink < 1) {
+          c.globalAlpha = blink;
+        } else if (scale > 1) {
+          var alpha = 1.5 - scale;
+          c.globalAlpha = (alpha < 0) ? 0 : alpha;
+        } else {
+          c.globalAlpha = this.upgrades.shieldStrength / 3;
+        }
         c.save();
+        c.scale(scale, scale);
         c.beginPath();
         c.arc(0, 0, 20, 0, TAU);
         c.lineWidth = width;
@@ -689,7 +705,7 @@
         c.lineWidth = 1;
         c.strokeStyle='#FFBE40';
         c.stroke();
-        if (this.flash > 0) {
+        if (this.flash > 0 || scale > 1) {
           c.lineWidth = width;
           c.globalCompositeOperation = 'lighter';
           c.globalAlpha = this.flash / 800;
@@ -697,6 +713,9 @@
         }
         c.restore();
       } else if (this.flash > 0) {
+        if (scale > 1) {
+          foo = 0;
+        }
         c.globalCompositeOperation = 'lighter';
         c.globalAlpha = this.flash / 800;
         c.drawImage(Guy.canvas, -15, -10);
@@ -765,6 +784,14 @@
         bolt.velY = Math.sin(angle) * 3;
         bolt.add();
       }
+    },
+    shield: function () {
+      this.upgrades.shield = true;
+      this.upgrades.shieldStrength = 3;
+      this.newShieldTimeout = 200;
+    },
+    doubleGuns: function () {
+      this.upgrades.doubleGuns = true;
     },
 
     halfWidth: 10,
@@ -993,10 +1020,7 @@
     collide: function (other) {
       sfx.pickup.play();
       this.remove();
-      guy.upgrades[this.flavor] = true;
-      if (this.flavor === 'shield') {
-        guy.upgrades.shieldStrength = 3;
-      }
+      guy[this.flavor]();
     },
     derezz: function () {
       badGuyCount--;
