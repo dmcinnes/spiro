@@ -1107,6 +1107,45 @@
     keyDown = false;
   }, false);
 
+  window.addEventListener('touchstart', function (e) {
+    e.preventDefault();
+    KEYS.x = true;
+  });
+  window.addEventListener('touchmove', function (e) {
+    e.preventDefault();
+  });
+  window.addEventListener('touchend', function (e) {
+    e.preventDefault();
+    KEYS.x = false;
+  });
+  window.addEventListener("deviceorientation", function (e) {
+    var offset = 0;
+    if (window.orientation === -90) {
+      offset = 270;
+    } else if (window.orientation === 90) {
+      offset = 90;
+    }
+    var test = e.alpha - offset;
+    if (test > 180) {
+      test -= 360;
+    }
+
+    c.font = "20px sans-serif";
+    c.fillText(window.orientation + ' :: ' + e.alpha, 0, 0);
+    c.fillText(test, 0, 30);
+
+    if (Math.abs(test) > 45) {
+      if (test > 0) {
+        KEYS.left = true;
+      } else {
+        KEYS.right = true;
+      }
+    } else {
+      KEYS.right = false;
+      KEYS.left  = false;
+    }
+  });
+
   document.getElementById('start').addEventListener('click', function (e) {
     // start game
     currentState = states.begin;
