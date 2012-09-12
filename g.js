@@ -44,7 +44,8 @@
   var synth = new SfxrSynth();
 
   var sounds = {
-    shoot: "1,,0.14,,0.25,0.9927,0.6662,-0.2093,,,,,,0.715,-0.5504,,,,1,,,0.2751,,0.5"
+    shoot: "1,,0.14,,0.25,0.9927,0.6662,-0.2093,,,,,,0.715,-0.5504,,,,1,,,0.2751,,0.5",
+    pickup: "1,,0.0454,,0.4952,0.35,,0.1773,,,,,,,,,,,1,,,,,0.5"
   };
 
   var play = function () {
@@ -966,6 +967,7 @@
       c.drawImage(Pickup[this.flavor], -40, -40);
     },
     collide: function (other) {
+      sounds.pickup.play();
       this.remove();
       guy.upgrades[this.flavor] = true;
       if (this.flavor === 'shield') {
