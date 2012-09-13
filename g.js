@@ -38,6 +38,15 @@
     timestamp = Date.now;
   }
 
+  var hasTouch = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch);
+  if (hasTouch) {
+    document.body.className = "touch";
+  }
+
+  if (hasTouch && window.innerHeight < 600) {
+    var meta = document.querySelector('meta[name="viewport"]');
+    meta.content = meta.content.replace(/1/g, '0.45');
+  }
 
   ////////////////
   /// Sound FX ///
@@ -127,18 +136,13 @@
       windowHalfWidth,
 
       savedLine,
-      savedLineCanvas = document.createElement('canvas'),
-      hasTouch = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch);
+      savedLineCanvas = document.createElement('canvas');
 
   savedLineCanvas.width  = canvas.width;
   savedLineCanvas.height = canvas.height;
 
   c.translate(305, 305);
   c.lineWidth = 2;
-
-  if (hasTouch) {
-    document.body.className = "touch";
-  }
 
 
   ///////////////
