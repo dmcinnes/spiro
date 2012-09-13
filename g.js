@@ -1626,9 +1626,10 @@
 
   function renderPulse() {
     c.save();
-    c.translate(-20 - maxRadius , maxRadius - 60);
+    c.translate(-20 - maxRadius , maxRadius - 70);
     c.drawImage(Pulse.canvas, 0, 0);
     c.drawImage(Pulse.canvas, 10, 0);
+    c.drawImage(Pulse.canvas, 5, 10);
     c.restore();
   }
 
