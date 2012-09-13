@@ -124,6 +124,7 @@
       titleOffset = 0,
       extraGuys = 2,
       GAME_OVER_LENGTH = 6000,
+      windowHalfWidth,
 
       savedLine,
       savedLineCanvas = document.createElement('canvas');
@@ -1107,44 +1108,47 @@
     keyDown = false;
   }, false);
 
-  window.addEventListener('touchstart', function (e) {
-    e.preventDefault();
-    KEYS.x = true;
-  });
-  window.addEventListener('touchmove', function (e) {
-    e.preventDefault();
-  });
-  window.addEventListener('touchend', function (e) {
-    e.preventDefault();
-    KEYS.x = false;
-  });
-  window.addEventListener("deviceorientation", function (e) {
-    var offset = 0;
-    if (window.orientation === -90) {
-      offset = 270;
-    } else if (window.orientation === 90) {
-      offset = 90;
-    }
-    var test = e.alpha - offset;
-    if (test > 180) {
-      test -= 360;
-    }
+  function handleOrientationChange(e) {
+    windowHalfWidth = window.innerWidth / 2;
+    window.scrollTo(0,1);
+  }
+  handleOrientationChange();
 
-    c.font = "20px sans-serif";
-    c.fillText(window.orientation + ' :: ' + e.alpha, 0, 0);
-    c.fillText(test, 0, 30);
-
-    if (Math.abs(test) > 45) {
-      if (test > 0) {
-        KEYS.left = true;
-      } else {
-        KEYS.right = true;
-      }
-    } else {
-      KEYS.right = false;
+  function handleTouch(e) {
+    e.preventDefault();
+    if (e.type != 'touchend') {
       KEYS.left  = false;
+      KEYS.right = false;
+      KEYS.x     = false;
+      KEYS.space = false;
     }
-  });
+    var touches = e.type == 'touchend' ? e.changedTouches : e.touches;
+    for (var i = 0; i < touches.length; i++) {
+      var status = e.type !== 'touchend';
+      if (touches[i].pageX < windowHalfWidth) {
+        KEYS.left = status;
+      } else {
+        KEYS.right = status;
+      }
+      KEYS.x = status;
+      if (e.type === 'touchstart' &&
+          touches[i].pageY < 100) {
+        KEYS.space = true;
+      }
+    }
+    // stop if both at the same time
+    if (KEYS.left && KEYS.right) {
+      KEYS.left = false;
+      KEYS.right = false;
+    }
+    keyDown = KEYS.x;
+  }
+
+  window.addEventListener('touchstart', handleTouch);
+  window.addEventListener('touchmove',  handleTouch);
+  window.addEventListener('touchend',   handleTouch);
+
+  window.addEventListener('orientationchange', handleOrientationChange);
 
   document.getElementById('start').addEventListener('click', function (e) {
     // start game
