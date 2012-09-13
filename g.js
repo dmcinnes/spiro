@@ -134,6 +134,7 @@
       extraGuys = 2,
       GAME_OVER_LENGTH = 6000,
       windowHalfWidth,
+      extraSpiders = 0,
 
       savedLine,
       savedLineCanvas = document.createElement('canvas');
@@ -507,7 +508,7 @@
         var tan = this.segment.tangent,
             dirStart = Math.floor(Math.random() * 4),
             s, dir;
-        for (var i = 0; i < currentLevel.eggCount; i++) {
+        for (var i = 0; i < currentLevel.eggCount + extraSpiders; i++) {
           s = new Spider(size);
           dir = tan + Spider.eggDirections[(dirStart + i) % 4];
           s.egg = true;
@@ -1572,6 +1573,11 @@
 
     // queue up next level
     currentLevelNumber = (levelNumber === undefined) ? currentLevelNumber + 1 : levelNumber;
+    if (currentLevelNumber >= levels.length) {
+      // loop the levels, just give them more spiders
+      currentLevelNumber = 0;
+      extraSpiders++;
+    }
     currentLevel = levels[currentLevelNumber];
     currentLevel.nextBaddie = 0;
     badGuyCount = 0;
@@ -1782,6 +1788,7 @@
     begin: function () {
       score = 0;
       extraGuys = 2;
+      extraSpiders = 0;
       menuNode.style.display = 'none';
       instructionsNode.style.display = 'none';
       zz = 0;
@@ -1803,7 +1810,7 @@
       renderCanvasHudElements();
     },
     runLevel: function (elapsed) {
-      if (badGuyCount === 0 && currentLevelNumber+1 < levels.length) {
+      if (badGuyCount === 0) {
         levelTimeout = 1500;
         currentState = states.runOutLevel;
       }
