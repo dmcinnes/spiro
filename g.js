@@ -127,13 +127,18 @@
       windowHalfWidth,
 
       savedLine,
-      savedLineCanvas = document.createElement('canvas');
+      savedLineCanvas = document.createElement('canvas'),
+      hasTouch = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch);
 
   savedLineCanvas.width  = canvas.width;
   savedLineCanvas.height = canvas.height;
 
   c.translate(305, 305);
   c.lineWidth = 2;
+
+  if (hasTouch) {
+    document.body.className = "touch";
+  }
 
 
   ///////////////

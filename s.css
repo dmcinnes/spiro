@@ -78,3 +78,18 @@ body{
   top:-50px;
   left:-50%;
 }
+#mob {
+  display:none;
+}
+.touch #mob {
+  display:block;
+}
+.touch #dk {
+  display:none;
+}
+.touch #start {
+  display:none;
+}
+.touch #i{
+  bottom:100px;
+}
