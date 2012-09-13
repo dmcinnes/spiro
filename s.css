@@ -104,3 +104,10 @@ body{
   margin-left: -20px;
   margin-top: -20px;
 }
+a,a:visited {
+  text-decoration:none;
+  color:#6C8DD5;
+}
+a:hover {
+  color:#FFCF73;
+}
