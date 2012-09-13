@@ -368,6 +368,7 @@
     this.collidable = false;
   };
   Spider.range = Math.pow(maxRadius + 100, 2);
+  Spider.eggDirections = [-PI/4, -3*PI/4, PI/4, 3*PI/4];
   Spider.prototype = {
     tick: function (delta) {
       if (this.egg) {
@@ -494,7 +495,6 @@
       c.stroke();
       c.restore();
     },
-    eggDirections: [-PI/4, -3*PI/4, PI/4, 3*PI/4],
     collide: function (other) {
       sfx.splode2.play();
       // smaller eggs worth more
@@ -507,9 +507,9 @@
         var tan = this.segment.tangent,
             dirStart = Math.floor(Math.random() * 4),
             s, dir;
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < currentLevel.eggCount; i++) {
           s = new Spider(size);
-          dir = tan + this.eggDirections[(dirStart + i) % 4];
+          dir = tan + Spider.eggDirections[(dirStart + i) % 4];
           s.egg = true;
           s.hatchTime = 500;
           s.x = this.x;
@@ -1646,6 +1646,7 @@
       },
       bgcc: 3,
       badaSize: 2,
+      eggCount: 2,
       baddies: [Jelly, Spider, Bada, Seeker, Pickup, Bada, Bada, Bada]
     },
 
@@ -1655,6 +1656,7 @@
       },
       bgcc: 3,
       badaSize: 3,
+      eggCount: 2,
       baddies: [Jelly, Spider, Bada, Bada, Pickup, Bada, Bada, Seeker]
     },
 
@@ -1664,6 +1666,7 @@
       },
       bgcc: 4,
       badaSize: 4,
+      eggCount: 2,
       baddies: [Jelly, Spider, Bada, Bada, Bada, Pickup, Bada, Seeker]
     },
 
@@ -1673,6 +1676,7 @@
       },
       bgcc: 4,
       badaSize: 4,
+      eggCount: 2,
       baddies: [Jelly, Spider, Bada, Pickup, Bada, Bada, Bada, Seeker, Bada, Seeker]
     },
 
@@ -1682,6 +1686,7 @@
       },
       bgcc: 4,
       badaSize: 3,
+      eggCount: 2,
       baddies: [Jelly, Spider, Bada, Bada, Pickup, Bada, Bada, Seeker]
     },
 
@@ -1691,6 +1696,7 @@
       },
       bgcc: 3,
       badaSize: 2,
+      eggCount: 2,
       baddies: [Jelly, Spider, Bada, Bada, Bada, Bada]
     }
   ];
