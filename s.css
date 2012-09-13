@@ -84,12 +84,23 @@ body{
 .touch #mob {
   display:block;
 }
-.touch #dk {
-  display:none;
-}
-.touch #start {
+.touch #dk, .touch #start {
   display:none;
 }
 .touch #i{
-  bottom:100px;
+  bottom:10px;
+}
+#doub, #shield {
+  position:relative;
+  width:40px;
+  height:40px;
+  overflow:hidden;
+  top: -10px;
+  right: 40px;
+}
+#doub canvas, #shield canvas {
+  position:absolute;
+  display: inline;
+  margin-left: -20px;
+  margin-top: -20px;
 }

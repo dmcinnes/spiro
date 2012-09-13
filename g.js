@@ -1034,7 +1034,6 @@
         c.globalAlpha = (1 + Math.cos(TAU * percent * 30)) / 2;
       }
       c.scale(scale, scale);
-      c.drawImage(Pickup.canvas, -40, -40);
       c.drawImage(Pickup[this.flavor], -40, -40);
     },
     collide: function (other) {
@@ -1052,38 +1051,41 @@
 
   // create Pickup sprite
   (function () {
-    var can = document.createElement('canvas');
-    Pickup.canvas = can;
-    can.width  = 80;
-    can.height = 80;
-    var con = can.getContext('2d');
-    con.beginPath();
-    con.fillStyle   = '#FFBE40';
-    con.shadowColor = '#FFCF73';
-    con.shadowBlur  = '30';
-    con.arc(40, 40, 10, 0, TAU);
-    con.fill();
+    function renderGlow(con) {
+      con.beginPath();
+      con.fillStyle   = '#FFBE40';
+      con.shadowColor = '#FFCF73';
+      con.shadowBlur  = '30';
+      con.arc(40, 40, 10, 0, TAU);
+      con.fill();
+    }
 
     can = document.createElement('canvas');
     Pickup.doubleGuns = can;
     can.width  = 80;
     can.height = 80;
     con = can.getContext('2d');
+    renderGlow(con);
     con.scale(0.6, 0.4);
     con.drawImage(Bolt.canvas, 56.5, 80, 10, 40);
     con.drawImage(Bolt.canvas, 66.5, 80, 10, 40);
+
+    document.getElementById('doub').appendChild(can);
 
     can = document.createElement('canvas');
     Pickup.shield = can;
     can.width  = 80;
     can.height = 80;
     con = can.getContext('2d');
+    renderGlow(con);
     con.beginPath();
     con.arc(40, 40, 6, 0, TAU);
     con.shadowBlur='10';
     con.shadowColor='#06276F';
     con.strokeStyle='#06276F';
     con.stroke();
+
+    document.getElementById('shield').appendChild(can);
   })();
 
 
