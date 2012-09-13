@@ -1127,13 +1127,13 @@
 
   function handleTouch(e) {
     e.preventDefault();
-    if (e.type != 'touchend') {
+    if (e.type !== 'touchend') {
       KEYS.left  = false;
       KEYS.right = false;
       KEYS.x     = false;
       KEYS.space = false;
     }
-    var touches = e.type == 'touchend' ? e.changedTouches : e.touches;
+    var touches = e.type === 'touchend' ? e.changedTouches : e.touches;
     for (var i = 0; i < touches.length; i++) {
       var status = e.type !== 'touchend';
       if (touches[i].pageX < windowHalfWidth) {
