@@ -283,8 +283,8 @@
   Sprite(Bada);
 
   var Seeker = function () {
-    this.x = 0;
-    this.y = 0;
+    this.x = Math.floor(gameWidth * Math.random()) - maxRadius;
+    this.y = Math.floor(gameWidth * Math.random()) - maxRadius;
     this.scale = 0;
     this.dir = PI/2;
     this.rot = 0;
@@ -1581,7 +1581,7 @@
     precalculateLineSegments(currentLevel);
 
     // add first bad guys
-    for (var i = 0; i < currentLevel.bgcc; i++) {
+    for (var i = 0; i < currentLevel.spawnStart; i++) {
       newBadGuy();
     }
 
@@ -1642,19 +1642,65 @@
   var levels = [
     {
       f: function (t) {
+        // four curve
         return maxRadius * Math.cos(Math.sin(t * zz)) - 20;
       },
-      bgcc: 3,
+      spawnStart: 3,
       badaSize: 2,
-      eggCount: 2,
-      baddies: [Jelly, Spider, Bada, Seeker, Pickup, Bada, Bada, Bada]
+      eggCount: 1,
+      baddies: [Spider, Bada, Bada, Pickup, Bada, Bada]
     },
 
     {
       f: function (t) {
+        // eight curve
+        return maxRadius * Math.cos(Math.sin(2 * t * zz)) - 20;
+      },
+      spawnStart: 3,
+      badaSize: 3,
+      eggCount: 1,
+      baddies: [Jelly, Spider, Bada, Pickup, Bada, Bada]
+    },
+
+    {
+      f: function (t) {
+        // four leaf clover
+        return Math.sin(t * zz) * maxRadius;
+      },
+      spawnStart: 3,
+      badaSize: 3,
+      eggCount: 1,
+      baddies: [Jelly, Spider, Bada, Pickup, Bada, Bada]
+    },
+
+    {
+      f: function (t) {
+        // inner loop
+        return (zz * maxRadius / 3.4*(1 + Math.sin(t))) - 100;
+      },
+      spawnStart: 2,
+      badaSize: 3,
+      eggCount: 1,
+      baddies: [Seeker, Spider, Spider, Bada, Pickup, Bada, Bada]
+    },
+ 
+    {
+      f: function (t) {
+        // knot with warp
+        return (Math.cos(t / zz) - Math.sin(t)) * maxRadius;
+      },
+      spawnStart: 6,
+      badaSize: 3,
+      eggCount: 1,
+      baddies: [Jelly, Jelly, Jelly, Jelly, Jelly, Jelly, Pickup, Jelly, Jelly, Jelly, Jelly]
+    },
+
+    {
+      f: function (t) {
+        // heart
         return (zz * maxRadius / 4.2*(1 + Math.cos(t)));
       },
-      bgcc: 3,
+      spawnStart: 3,
       badaSize: 3,
       eggCount: 2,
       baddies: [Jelly, Spider, Bada, Bada, Pickup, Bada, Bada, Seeker]
@@ -1662,19 +1708,43 @@
 
     {
       f: function (t) {
-        return Math.sin(t * zz) * maxRadius;
+        // three leaf overlapped clover
+        return maxRadius * Math.sin(t + t * zz);
       },
-      bgcc: 4,
-      badaSize: 4,
+      spawnStart: 3,
+      badaSize: 2,
       eggCount: 2,
-      baddies: [Jelly, Spider, Bada, Bada, Bada, Pickup, Bada, Seeker]
+      baddies: [Seeker, Seeker, Seeker, Seeker, Seeker, Seeker, Seeker, Seeker]
     },
 
     {
       f: function (t) {
-        return maxRadius * Math.cos(Math.sin(2 * t * zz)) - 20;
+        // eight leaf clover
+        return Math.sin(2*t + t * zz) * maxRadius;
       },
-      bgcc: 4,
+      spawnStart: 3,
+      badaSize: 4,
+      eggCount: 2,
+      baddies: [Jelly, Spider, Bada, Bada, Bada, Pickup, Bada]
+    },
+
+    {
+      f: function (t) {
+        // eight leaf with fat and small leaves
+        return maxRadius * Math.cos(3*Math.sin(t * zz));
+      },
+      spawnStart: 3,
+      badaSize: 3,
+      eggCount: 2,
+      baddies: [Jelly, Spider, Bada, Bada, Pickup, Bada, Bada]
+    },
+
+    {
+      f: function (t) {
+        // offset circle
+        return maxRadius * Math.cos(Math.sin(t / zz)) - 20;
+      },
+      spawnStart: 4,
       badaSize: 4,
       eggCount: 2,
       baddies: [Jelly, Spider, Bada, Pickup, Bada, Bada, Bada, Seeker, Bada, Seeker]
@@ -1682,23 +1752,15 @@
 
     {
       f: function (t) {
+        // eight leaf with smaller inset petals
         return maxRadius * Math.cos(2*Math.sin(t * zz));
       },
-      bgcc: 4,
+      spawnStart: 4,
       badaSize: 3,
       eggCount: 2,
-      baddies: [Jelly, Spider, Bada, Bada, Pickup, Bada, Bada, Seeker]
-    },
-
-    {
-      f: function (t) {
-        return maxRadius * Math.sin(t + t * zz);
-      },
-      bgcc: 3,
-      badaSize: 2,
-      eggCount: 2,
-      baddies: [Jelly, Spider, Bada, Bada, Bada, Bada]
+      baddies: [Jelly, Jelly, Spider, Bada, Bada, Pickup, Bada, Bada, Seeker, Seeker]
     }
+
   ];
 
   //////////////
