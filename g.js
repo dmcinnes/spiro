@@ -690,6 +690,8 @@
           this.newShieldTimeout = 0;
         }
       }
+
+      this.jump();
     },
 
     render: function (c) {
@@ -744,6 +746,7 @@
     },
 
     collide: function (other) {
+      return false;
       var p;
       if (other.type & BAD_GUYS) {
         if (this.upgrades.shieldStrength > 0) {
@@ -813,6 +816,61 @@
     },
     doubleGuns: function () {
       this.upgrades.doubleGuns = true;
+    },
+
+    jump: function () {
+      var i, px, py, dot, segment, distance, jumpSegment;
+      var minDistance = Number.MAX_VALUE;
+      var tx = Math.cos(this.rot);
+      var ty = Math.sin(this.rot);
+      var x = Math.cos(this.angle) * this.dist;
+      var y = Math.sin(this.angle) * this.dist;
+
+      var guyDot = x * tx + y * ty;
+
+      var segments = currentLevel.segments;
+      var length   = segments.length;
+
+      for (i = 0; i < length; i++) {
+        segment = segments[i];
+        px = segment.x;
+        py = segment.y;
+
+        dot = px * tx + py * ty;
+        if (Math.abs(dot - guyDot) < 5) {
+
+          c.save();
+          c.rotate(rot);
+          c.translate(px, py);
+          c.fillStyle = '#f00';
+          c.beginPath();
+          c.arc(-5, -5, 10, 0, TAU);
+          c.closePath();
+          c.fill();
+          c.restore();
+
+          distance = Math.abs(px * x + py * y);
+          if (distance < minDistance) {
+            jumpSegment = segment;
+            minDistance = distance;
+          }
+        }
+      }
+      
+      if (jumpSegment) {
+        px = jumpSegment.x;
+        py = jumpSegment.y;
+        c.save();
+        c.rotate(rot);
+        c.translate(px, py);
+        c.fillStyle = '#0f0';
+        c.beginPath();
+        c.arc(-5, -5, 10, 0, TAU);
+        c.closePath();
+        c.fill();
+        c.restore();
+      }
+
     },
 
     halfWidth: 10,
@@ -1255,13 +1313,16 @@
         angle=step,
         x2, y2, x, y;
     while (angle <= TAU) {
-      w = f(angle,z);
+      w = f(angle, z);
       x2 = Math.cos(angle)*w;
       y2 = Math.sin(angle)*w;
       x = x2 - x1;
       y = y2 - y1;
       length = Math.sqrt(x*x + y*y);
       segments[i] = {
+        x:        x2,
+        y:        y2,
+        radius:   w,
         length:   length,
         position: position,
         tangent:  Math.atan2(y, x)
