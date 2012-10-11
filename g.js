@@ -662,7 +662,13 @@
       this.angle = rot;
 
       this.segment = segmentForAngle(this.angle);
-      this.rot = this.segment.tangent;
+
+      // interpolate the current tangent
+      var linePosition = segmentCount * clamp(this.angle) / TAU;
+      var posOffset = linePosition - Math.floor(linePosition);
+      var nextSegmentPosition = Math.floor((linePosition + 1) % segmentCount);
+      var nextSegment = currentLevel.segments[nextSegmentPosition];
+      this.rot = this.segment.tangent + posOffset * (nextSegment.tangent - this.segment.tangent);
 
       this.updateSpriteCartesian();
 
